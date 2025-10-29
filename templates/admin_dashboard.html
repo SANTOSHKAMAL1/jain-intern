@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f23; color: #e0e0e0; padding: 16px; }
+        .dashboard-container { max-width: 1600px; margin: 0 auto; }
+        .dashboard-header { background: #1a1a2e; padding: 20px 30px; border-radius: 12px; border: 1px solid #2a2a3e; margin-bottom: 24px; }
+        .dashboard-header h1 { color: #fff; font-size: 1.5em; font-weight: 600; margin-bottom: 8px; }
+        .tabs { display: flex; gap: 8px; margin-top: 16px; }
+        .tab { background: #0f0f23; border: 1px solid #2a2a3e; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+        .tab.active { background: #667eea; border-color: #667eea; color: white; }
+        .tab:hover { border-color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: #1a1a2e; border: 1px solid #2a2a3e; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .card h2 { color: #fff; font-size: 1.2em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .card-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #a0a0a0; font-size: 0.85em; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; background: #0f0f23; border: 1px solid #2a2a3e; border-radius: 6px; padding: 10px; color: #e0e0e0; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #0f0f23; }
+        th { padding: 12px; text-align: left; font-size: 0.8em; color: #808080; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #2a2a3e; }
+        tbody tr:hover { background: rgba(102, 126, 234, 0.05); }
+        
+        /* Calendar Styles */
+        .calendar-controls { display: flex; gap: 16px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .calendar-controls select { background: #0f0f23; border: 1px solid #2a2a3e; padding: 8px 12px; border-radius: 6px; color: #e0e0e0; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .calendar-month { font-size: 1.1em; font-weight: 600; }
+        .calendar-nav button { background: #0f0f23; border: 1px solid #2a2a3e; color: #e0e0e0; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; margin: 0 4px; }
+        .calendar-nav button:hover { border-color: #667eea; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+        .calendar-day-header { text-align: center; font-size: 0.7em; color: #808080; text-transform: uppercase; padding: 8px 0; }
+        .calendar-day { aspect-ratio: 1; background: #0f0f23; border: 1px solid #2a2a3e; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; padding: 4px; font-size: 0.75em; }
+        .calendar-day:hover { border-color: #667eea; }
+        .calendar-day.other-month { color: #4a4a5e; }
+        .calendar-day.today { border-color: #667eea; color: #667eea; }
+        .calendar-day-number { font-weight: 600; margin-bottom: 2px; }
+        .calendar-day-status { font-size: 0.65em; padding: 2px 4px; border-radius: 3px; margin-top: 2px; }
+        .status-present { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-absent { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .status-leave { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        
+        /* User Legend */
+        .user-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding: 16px; background: #0f0f23; border-radius: 8px; }
+        .user-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8em; border: 1px solid #2a2a3e; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1a1a2e; border: 1px solid #2a2a3e; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-close { background: none; border: none; color: #808080; font-size: 1.5em; cursor: pointer; }
+        .detail-item { margin-bottom: 12px; padding: 12px; background: #0f0f23; border-radius: 6px; }
+        .detail-label { font-size: 0.7em; color: #808080; text-transform: uppercase; margin-bottom: 4px; }
+        .detail-value { color: #fff; font-weight: 600; }
+        
+        @media (max-width: 968px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">Overview</div>
+                <div class="tab" onclick="switchTab('calendar')">Calendar View</div>
+                <div class="tab" onclick="switchTab('users')">Users</div>
+                <div class="tab" onclick="switchTab('export')">Export</div>
+            </div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-user-plus"></i></div> Create New User</h2>
+                <form method="POST" action="{{ url_for('admin_create_user') }}" class="form-grid">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role:</label>
+                        <select name="role">
+                            <option value="intern">Intern</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn btn-primary">Create User</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-history"></i></div> Recent Attendance</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Date</th>
+                            <th>Login</th>
+                            <th>Logout</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in recent[:20] %}
+                        <tr>
+                            <td>{{ rec.username }}</td>
+                            <td>{{ rec.date }}</td>
+                            <td>{{ rec.login_time or 'N/A' }}</td>
+                            <td>{{ rec.logout_time or 'N/A' }}</td>
+                            <td><strong>{{ rec.hours or 'N/A' }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-calendar-times"></i></div> Recent Leaves</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leaves[:20] %}
+                        <tr>
+                            <td>{{ leave.username }}</td>
+                            <td>{{ leave.date }}</td>
+                            <td><span class="status-badge status-leave">{{ leave.type }}</span></td>
+                            <td>{{ leave.comments or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div id="calendar" class="tab-content">
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-calendar-alt"></i></div> Attendance Calendar</h2>
+                
+                <div class="calendar-controls">
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label>Select Users:</label>
+                        <select id="userFilter" multiple style="height: 80px;">
+                            <option value="all" selected>All Users</option>
+                            {% for user in users %}
+                            {% if user.role == 'intern' %}
+                            <option value="{{ user._id }}">{{ user.username }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: flex-end;">
+                        <button class="btn btn-primary" onclick="loadCalendarData()">Load Calendar</button>
+                        <button class="btn btn-success" onclick="selectAllUsers()">Select All</button>
+                    </div>
+                </div>
+
+                <div class="user-legend" id="userLegend"></div>
+
+                <div class="calendar-header">
+                    <div class="calendar-month" id="calendarMonth">Loading...</div>
+                    <div class="calendar-nav">
+                        <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-users"></i></div> All Users ({{ users|length }})</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email or 'N/A' }}</td>
+                            <td><span class="status-badge status-{{ 'active' if user.role == 'admin' else 'inactive' }}">{{ user.role }}</span></td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Export Tab -->
+        <div id="export" class="tab-content">
+            <div class="card">
+                <h2><div class="card-icon"><i class="fas fa-download"></i></div> Export Attendance</h2>
+                <form method="GET" action="{{ url_for('admin_export') }}" class="form-grid">
+                    <div class="form-group">
+                        <label>Start Date:</label>
+                        <input type="date" name="start" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date:</label>
+                        <input type="date" name="end" required>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn btn-success">Export CSV</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Attendance Details</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = new Date();
+        let calendarData = {};
+        const userColors = ['#667eea', '#22c55e', '#ef4444', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function selectAllUsers() {
+            const select = document.getElementById('userFilter');
+            for (let opt of select.options) {
+                opt.selected = true;
+            }
+        }
+
+        async function loadCalendarData() {
+            const select = document.getElementById('userFilter');
+            const selected = Array.from(select.selectedOptions).map(o => o.value);
+            
+            if (selected.length === 0) {
+                alert('Please select at least one user');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            selected.forEach(u => params.append('users', u));
+            
+            const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+            const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+            params.append('start_date', start.toISOString().split('T')[0]);
+            params.append('end_date', end.toISOString().split('T')[0]);
+
+            const res = await fetch(`/api/admin/calendar-data?${params}`);
+            const data = await res.json();
+            calendarData = data.calendar_data;
+            
+            renderUserLegend();
+            renderCalendar();
+        }
+
+        function renderUserLegend() {
+            const legend = document.getElementById('userLegend');
+            const users = Object.keys(calendarData);
+            legend.innerHTML = users.map((user, i) => {
+                const color = userColors[i % userColors.length];
+                return `<div class="user-badge" style="border-color: ${color}; color: ${color};">${user}</div>`;
+            }).join('');
+        }
+
+        function renderCalendar() {
+            const y = currentMonth.getFullYear();
+            const m = currentMonth.getMonth();
+            document.getElementById('calendarMonth').textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const first = new Date(y, m, 1);
+            const last = new Date(y, m + 1, 0);
+            const startWeek = first.getDay();
+            const total = last.getDate();
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+                const h = document.createElement('div');
+                h.className = 'calendar-day-header';
+                h.textContent = d;
+                grid.appendChild(h);
+            });
+
+            for (let i = startWeek - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.innerHTML = `<div class="calendar-day-number">${new Date(y, m, 0).getDate() - i}</div>`;
+                grid.appendChild(day);
+            }
+
+            const today = new Date();
+            for (let d = 1; d <= total; d++) {
+                const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                
+                if (d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) {
+                    day.classList.add('today');
+                }
+
+                day.innerHTML = `<div class="calendar-day-number">${d}</div>`;
+
+                // Add user statuses
+                const users = Object.keys(calendarData);
+                users.forEach((user, i) => {
+                    const data = calendarData[user][dateStr];
+                    if (data) {
+                        const color = userColors[i % userColors.length];
+                        const statusClass = data.type === 'present' ? 'status-present' : 'status-leave';
+                        const dot = document.createElement('div');
+                        dot.style.cssText = `width:6px; height:6px; border-radius:50%; background:${color}; margin:1px;`;
+                        day.appendChild(dot);
+                    }
+                });
+
+                day.onclick = () => showDetails(dateStr);
+                grid.appendChild(day);
+            }
+        }
+
+        function showDetails(date) {
+            const modal = document.getElementById('detailModal');
+            const body = document.getElementById('modalBody');
+            body.innerHTML = '';
+
+            let hasData = false;
+            Object.keys(calendarData).forEach((user, i) => {
+                const data = calendarData[user][date];
+                if (data) {
+                    hasData = true;
+                    const color = userColors[i % userColors.length];
+                    const item = document.createElement('div');
+                    item.className = 'detail-item';
+                    item.style.borderLeft = `3px solid ${color}`;
+                    
+                    if (data.type === 'present') {
+                        item.innerHTML = `
+                            <div class="detail-label">${user}</div>
+                            <div class="detail-value">Present</div>
+                            <div style="margin-top:8px; font-size:0.85em; color:#a0a0a0;">
+                                Login: ${data.login_time}<br>
+                                Logout: ${data.logout_time}<br>
+                                Hours: ${data.hours}
+                            </div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div class="detail-label">${user}</div>
+                            <div class="detail-value">Leave - ${data.leave_type}</div>
+                            <div style="margin-top:8px; font-size:0.85em; color:#a0a0a0;">
+                                ${data.comments || 'No comments'}
+                            </div>
+                        `;
+                    }
+                    body.appendChild(item);
+                }
+            });
+
+            if (!hasData) {
+                body.innerHTML = '<div style="text-align:center; color:#808080; padding:20px;">No records for this date</div>';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function changeMonth(delta) {
+            currentMonth.setMonth(currentMonth.getMonth() + delta);
+            loadCalendarData();
+        }
+
+        document.getElementById('detailModal').onclick = e => {
+            if (e.target.id === 'detailModal') closeModal();
+        };
+
+        // Load initial calendar data
+        setTimeout(() => {
+            if (document.querySelector('.tab-content.active').id === 'calendar') {
+                loadCalendarData();
+            }
+        }, 100);
+    </script>
+</body>
+</html>
+{% endblock %}

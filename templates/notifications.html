@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: #1a1a2e;
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 1px solid #2a2a3e;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            color: #ffffff;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .time-info {
+            font-size: 0.85em;
+            color: #a0a0a0;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #3a3a5e;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .card-header h2 {
+            font-size: 1.1em;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .attendance-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .action-box {
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .action-label {
+            font-size: 0.75em;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .action-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .time-display {
+            font-size: 1.5em;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: #16a34a;
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-logout:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .stat-unit {
+            font-size: 0.5em;
+            color: #a0a0a0;
+        }
+
+        /* Calendar Styles */
+        .calendar-container {
+            grid-column: 1 / -1;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .calendar-nav button {
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            color: #e0e0e0;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .calendar-month {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 0.75em;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .calendar-day:hover {
+            border-color: #667eea;
+        }
+
+        .calendar-day.other-month {
+            color: #4a4a5e;
+        }
+
+        .calendar-day.today {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .calendar-day.present {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .calendar-day.absent {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .calendar-day.leave {
+            background: rgba(234, 179, 8, 0.2);
+            border-color: #eab308;
+            color: #eab308;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #ffffff;
+            font-size: 1.3em;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #808080;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            border-radius: 6px;
+            padding: 12px;
+            color: #e0e0e0;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        /* History Table */
+        .history-container {
+            grid-column: 1 / -1;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination button {
+            background: #0f0f23;
+            border: 1px solid #2a2a3e;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #0f0f23;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 3px solid;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .attendance-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+<div class="dashboard">
+    <h1>Notifications</h1>
+    
+    {% if current_user.role == 'admin' %}
+    <div class="card">
+        <h2>Send Notification</h2>
+        <form method="POST" action="{{ url_for('admin_notifications') }}">
+            <div class="form-group">
+                <label>To User:</label>
+                <select name="to_user">
+                    <option value="all">All Users</option>
+                    {% for user in users %}
+                        {% if user.role == 'intern' %}
+                        <option value="{{ user.username }}">{{ user.username }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Message:</label>
+                <textarea name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Notification</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>All Notifications</h2>
+        {% if notifications %}
+            {% for notif in notifications %}
+            <div class="notification-item">
+                <p><strong>From:</strong> {{ notif.sender }}</p>
+                <p><strong>To:</strong> {{ notif.to_user }}</p>
+                <p><strong>Time:</strong> {{ notif.timestamp.strftime('%Y-%m-%d %H:%M:%S') if notif.timestamp else 'N/A' }}</p>
+                <p><strong>Message:</strong> {{ notif.message }}</p>
+                
+                {% if notif.replies %}
+                <div class="replies">
+                    <h4>Replies:</h4>
+                    {% for reply in notif.replies %}
+                    <div class="reply-item">
+                        <p><strong>{{ reply.username }}:</strong> {{ reply.text }}</p>
+                        <p class="reply-time">{{ reply.timestamp.strftime('%Y-%m-%d %H:%M:%S') if reply.timestamp else '' }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('reply_notification', nid=notif._id) }}" class="reply-form">
+                    <input type="text" name="reply_text" placeholder="Type your reply..." required>
+                    <button type="submit" class="btn btn-sm">Reply</button>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No notifications yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

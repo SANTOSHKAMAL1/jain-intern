@@ -1,0 +1,332 @@
+
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        color: #e0e0e0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Animated background elements */
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+        animation: float 6s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .auth-card {
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(42, 42, 62, 0.6);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        box-shadow: 
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            0 0 80px rgba(102, 126, 234, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #22c55e);
+    }
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 0 100px rgba(102, 126, 234, 0.15);
+    }
+
+    .logo-container {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .logo-icon {
+        font-size: 4rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #22c55e 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+
+    .logo-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+
+    .tagline {
+        text-align: center;
+        color: #808080;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #a0a0a0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group label i {
+        width: 16px;
+        text-align: center;
+    }
+
+    .form-group input {
+        width: 100%;
+        background: rgba(15, 15, 35, 0.8);
+        border: 1px solid rgba(42, 42, 62, 0.8);
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: #e0e0e0;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: rgba(15, 15, 35, 0.9);
+    }
+
+    .form-group input::placeholder {
+        color: #606080;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: inherit;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(42, 42, 62, 0.6);
+        color: #606080;
+        font-size: 0.85rem;
+    }
+
+    .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Floating particles */
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 50%;
+        animation: float-particle 15s infinite linear;
+    }
+
+    @keyframes float-particle {
+        0% { transform: translateY(100vh) rotate(0deg); }
+        100% { transform: translateY(-100px) rotate(360deg); }
+    }
+</style>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo-container">
+            <i class="fas fa-user-lock logo-icon"></i>
+            <div class="logo-text">Intern Attendance</div>
+        </div>
+        
+        <p class="tagline">Secure login for intern attendance tracking and management</p>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            &copy; 2025 Jain-Intern Attendance System. Secure Access Only.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 15;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random properties
+            const size = Math.random() * 8 + 2;
+            const posX = Math.random() * 100;
+            const delay = Math.random() * 15;
+            const duration = Math.random() * 10 + 15;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${posX}%`;
+            particle.style.animationDelay = `${delay}s`;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.opacity = Math.random() * 0.3 + 0.1;
+            
+            particlesContainer.appendChild(particle);
+        }
+    });
+</script>
+{% endblock %}
