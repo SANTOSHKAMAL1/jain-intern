@@ -89,6 +89,40 @@
             letter-spacing: 0.5px;
         }
 
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #86868b;
+            transition: all 0.3s;
+        }
+
+        .notification-bell:hover {
+            color: #0071e3;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         .main-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -178,6 +212,21 @@
             color: #d70015;
         }
 
+        .status-pending {
+            background: #fff3cd;
+            color: #ff9500;
+        }
+
+        .status-approved {
+            background: #d1f4e0;
+            color: #0a7d3e;
+        }
+
+        .status-denied {
+            background: #ffe5e5;
+            color: #d70015;
+        }
+
         .time-display {
             font-size: 1.6em;
             color: #1d1d1f;
@@ -227,6 +276,27 @@
             transform: translateY(-1px);
         }
 
+        .btn-leave {
+            background: #ff9500;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 149, 0, 0.25);
+        }
+
+        .btn-leave:hover:not(:disabled) {
+            background: #ff8800;
+            box-shadow: 0 4px 16px rgba(255, 149, 0, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: #0071e3;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0077ed;
+        }
+
         .btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
@@ -271,148 +341,220 @@
             margin-left: 2px;
         }
 
-        /* Holiday Section Styles */
-        .holiday-list {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 16px;
-        }
-
-        .holiday-item {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-left: 4px solid;
-            transition: all 0.2s;
-        }
-
-        .holiday-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .holiday-item.general { border-color: #0071e3; }
-        .holiday-item.restricted { border-color: #ff9500; }
-        .holiday-item.special { border-color: #34c759; }
-        .holiday-item.saturday { border-color: #af52de; }
-
-        .holiday-date {
-            display: flex;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            justify-content: center;
         }
 
-        .holiday-day-badge {
-            background: #f5f5f7;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.75em;
-            font-weight: 700;
-            color: #1d1d1f;
-            min-width: 80px;
-            text-align: center;
+        .modal.active {
+            display: flex;
         }
 
-        .holiday-date-text {
-            font-size: 0.85em;
-            color: #86868b;
-            font-weight: 600;
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .holiday-name {
-            font-size: 0.95em;
-            color: #1d1d1f;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .holiday-type {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .holiday-type.general {
-            background: #e8f4fd;
-            color: #0071e3;
-        }
-
-        .holiday-type.restricted {
-            background: #fff3cd;
-            color: #ff9500;
-        }
-
-        .holiday-type.special {
-            background: #d1f4e0;
-            color: #34c759;
-        }
-
-        .holiday-type.saturday {
-            background: #f3e5f5;
-            color: #af52de;
-        }
-
-        .holiday-count {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
-            color: white;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .holiday-count-number {
-            font-size: 2.5em;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .holiday-count-text {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .calendar-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding: 0 4px;
+            margin-bottom: 24px;
         }
 
-        .calendar-month {
-            font-size: 1.1em;
+        .modal-header h3 {
+            font-size: 1.5em;
+            color: #1d1d1f;
             font-weight: 700;
-            color: #1d1d1f;
-            letter-spacing: -0.3px;
         }
 
-        .calendar-nav {
-            display: flex;
-            gap: 10px;
-        }
-
-        .calendar-nav button {
-            background: #ffffff;
-            border: 1px solid #e5e5e7;
-            color: #1d1d1f;
+        .modal-close {
+            background: #f5f5f7;
+            border: none;
+            color: #6e6e73;
+            font-size: 1.5em;
+            cursor: pointer;
             width: 36px;
             height: 36px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 600;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
-        .calendar-nav button:hover {
-            background: #e5e5e7;
-            transform: scale(1.05);
+        .modal-close:hover {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 10px;
+            font-size: 0.95em;
+            background: #f5f5f7;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0071e3;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95em;
+            animation: slideIn 0.3s ease;
+            border: 1px solid;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d1f4e0;
+            border-color: #34c759;
+            color: #0a7d3e;
+        }
+
+        .alert-danger {
+            background: #ffe5e5;
+            border-color: #ff3b30;
+            color: #d70015;
+        }
+
+        .alert-info {
+            background: #e8f4fd;
+            border-color: #0071e3;
+            color: #005bb5;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ff9500;
+            color: #c77700;
+        }
+
+        .notification-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .notification-panel.active {
+            right: 0;
+        }
+
+        .notification-panel-header {
+            padding: 24px;
+            background: #f5f5f7;
+            border-bottom: 1px solid #e5e5e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-panel-header h3 {
+            font-size: 1.3em;
+            color: #1d1d1f;
+        }
+
+        .notification-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f5f5f7;
+            transition: all 0.2s;
+        }
+
+        .notification-item:hover {
+            background: #fafafa;
+        }
+
+        .notification-item.unread {
+            background: #e8f4fd;
+        }
+
+        .notification-date {
+            font-size: 0.75em;
+            color: #86868b;
+            margin-bottom: 8px;
+        }
+
+        .notification-message {
+            color: #1d1d1f;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .notification-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
         .calendar-grid {
@@ -485,81 +627,24 @@
             border-color: #ffcc00;
         }
 
+        .calendar-day.leave-pending {
+            background: #ffe5b3;
+            color: #ff9500;
+            font-weight: 700;
+            border: 2px dashed #ff9500;
+        }
+
+        .calendar-day.leave-denied {
+            background: #ffe5e5;
+            color: #d70015;
+            font-weight: 700;
+            border: 2px solid #ff3b30;
+        }
+
         .calendar-day.absent {
             background: #ffe5e5;
             color: #d70015;
             border-color: #ff3b30;
-        }
-
-        .alert {
-            padding: 16px 20px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95em;
-            animation: slideIn 0.3s ease;
-            border: 1px solid;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: #d1f4e0;
-            border-color: #34c759;
-            color: #0a7d3e;
-        }
-
-        .alert-danger {
-            background: #ffe5e5;
-            border-color: #ff3b30;
-            color: #d70015;
-        }
-
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .history-table thead {
-            background: #ffffff;
-            border: 1px solid #e5e5e7;
-        }
-
-        .history-table th {
-            padding: 14px 12px;
-            font-size: 0.75em;
-            color: #86868b;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .history-table td {
-            padding: 16px 12px;
-            font-size: 0.9em;
-            border-bottom: 1px solid #f5f5f7;
-            color: #1d1d1f;
-        }
-
-        .history-table tbody tr {
-            background: #ffffff;
-            transition: all 0.2s;
-        }
-
-        .history-table tbody tr:hover {
-            background: #f5f5f7;
         }
 
         .loading {
@@ -593,6 +678,11 @@
             .time-info {
                 text-align: center;
             }
+
+            .notification-panel {
+                width: 100%;
+                right: -100%;
+            }
         }
     </style>
 </head>
@@ -601,6 +691,10 @@
         <div class="dashboard-header">
             <h1>Welcome, <span id="username">Loading...</span></h1>
             <div class="user-info">
+                <div class="notification-bell" onclick="toggleNotificationPanel()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
                 <div class="avatar" id="userAvatar">U</div>
                 <div class="time-info">
                     <div class="date" id="currentDate"></div>
@@ -636,6 +730,11 @@
                         </button>
                     </div>
                 </div>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-leave" onclick="openLeaveModal()">
+                        <i class="fas fa-calendar-times"></i> Apply for Leave
+                    </button>
+                </div>
             </div>
 
             <div class="card">
@@ -663,31 +762,16 @@
                 </div>
             </div>
 
-            <!-- Holidays This Month Card -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon"><i class="fas fa-gifts"></i></div>
-                    <h2>Holidays This Month</h2>
-                </div>
-                <div class="holiday-count" id="holidayCount">
-                    <div class="holiday-count-number">0</div>
-                    <div class="holiday-count-text">Holidays This Month</div>
-                </div>
-                <div class="holiday-list" id="holidayList">
-                    <div style="text-align: center; padding: 24px; color: #86868b;">Loading holidays...</div>
-                </div>
-            </div>
-
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
                     <h2>Attendance Calendar</h2>
                 </div>
-                <div class="calendar-header">
-                    <div class="calendar-month" id="calendarMonth">Loading...</div>
-                    <div class="calendar-nav">
-                        <button id="prevMonth">◀</button>
-                        <button id="nextMonth">▶</button>
+                <div class="calendar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="calendar-month" id="calendarMonth" style="font-size: 1.1em; font-weight: 700;">Loading...</div>
+                    <div class="calendar-nav" style="display: flex; gap: 10px;">
+                        <button id="prevMonth" style="background: #ffffff; border: 1px solid #e5e5e7; color: #1d1d1f; width: 36px; height: 36px; border-radius: 10px; cursor: pointer;">◀</button>
+                        <button id="nextMonth" style="background: #ffffff; border: 1px solid #e5e5e7; color: #1d1d1f; width: 36px; height: 36px; border-radius: 10px; cursor: pointer;">▶</button>
                     </div>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
@@ -695,25 +779,64 @@
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-icon"><i class="fas fa-history"></i></div>
-                    <h2>Recent History</h2>
+                    <div class="card-icon"><i class="fas fa-gifts"></i></div>
+                    <h2>Holidays This Month</h2>
                 </div>
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Login</th>
-                            <th>Logout</th>
-                            <th>Hours</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <tr>
-                            <td colspan="5" style="text-align:center;padding:24px;color:#86868b;">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div style="background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%); color: white; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 2.5em; font-weight: 800;" id="holidayCount">0</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">Holidays This Month</div>
+                </div>
+                <div id="holidayList" style="max-height: 300px; overflow-y: auto;">
+                    <div style="text-align: center; padding: 24px; color: #86868b;">Loading holidays...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Application Modal -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-times"></i> Apply for Leave</h3>
+                <button class="modal-close" onclick="closeLeaveModal()">&times;</button>
+            </div>
+            <form id="leaveForm" onsubmit="submitLeave(event)">
+                <div class="form-group">
+                    <label>Leave Date *</label>
+                    <input type="date" id="leaveDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Leave Type *</label>
+                    <select id="leaveType" required>
+                        <option value="">Select leave type</option>
+                        <option value="Sick Leave">Sick Leave</option>
+                        <option value="Casual Leave">Casual Leave</option>
+                        <option value="Personal Leave">Personal Leave</option>
+                        <option value="Emergency Leave">Emergency Leave</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reason / Comments</label>
+                    <textarea id="leaveComments" placeholder="Please provide a reason for your leave..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit Leave Application
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="notification-panel">
+        <div class="notification-panel-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="modal-close" onclick="toggleNotificationPanel()">&times;</button>
+        </div>
+        <div id="notificationList">
+            <div style="text-align: center; padding: 40px; color: #86868b;">
+                <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 16px; opacity: 0.3;"></i>
+                <p>No notifications</p>
             </div>
         </div>
     </div>
@@ -742,9 +865,9 @@
             const container = document.getElementById('alertContainer');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
-            alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+            alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i> ${msg}`;
             container.appendChild(alert);
-            setTimeout(() => alert.remove(), 5000);
+            setTimeout(() => alert.remove(), 6000);
         }
 
         // Location functions
@@ -847,6 +970,7 @@
                 updateUI(data);
                 await loadLeaves();
                 await loadHolidays();
+                await checkNotifications();
             } catch (err) {
                 showAlert('Failed to load data: ' + err.message, 'danger');
             }
@@ -881,7 +1005,6 @@
             data.history.forEach(r => attendanceData[r.date] = r);
             calculateStats();
             renderCalendar();
-            renderHistory();
         }
 
         // Calculate statistics
@@ -935,23 +1058,27 @@
                     day.classList.add('today');
                 }
                 
-                // Check for holiday first (holidays take priority)
                 if (holidayData[dateStr]) {
                     day.classList.add('holiday');
                     day.title = holidayData[dateStr].name;
                 }
-                // Then check for leave
                 else if (leaveData[dateStr]) {
-                    day.classList.add('leave');
-                    day.title = `${leaveData[dateStr].type}: ${leaveData[dateStr].comments || '—'}`;
+                    const status = leaveData[dateStr].status;
+                    if (status === 'approved') {
+                        day.classList.add('leave');
+                        day.title = `Leave: ${leaveData[dateStr].type}`;
+                    } else if (status === 'pending') {
+                        day.classList.add('leave-pending');
+                        day.title = `Leave Pending: ${leaveData[dateStr].type}`;
+                    } else if (status === 'denied') {
+                        day.classList.add('leave-denied');
+                        day.title = `Leave Denied: ${leaveData[dateStr].type}`;
+                    }
                 }
-                // Then check for attendance
                 else if (attendanceData[dateStr]?.login_time && attendanceData[dateStr].login_time !== 'N/A') {
                     day.classList.add('present');
                 }
-                // Mark as absent if it's a past weekday with no attendance, leave, or holiday
                 else if (new Date(y,m,d) < today && [1,2,3,4,5].includes(new Date(y,m,d).getDay())) {
-                    // Don't mark as absent if it's a holiday
                     if (!holidayData[dateStr]) {
                         day.classList.add('absent');
                     }
@@ -990,7 +1117,10 @@
             }
             
             if (leave) {
-                message += `📅 LEAVE\nType: ${leave.type}\nComments: ${leave.comments || 'None'}`;
+                message += `📅 LEAVE\nType: ${leave.type}\nStatus: ${leave.status.toUpperCase()}\nComments: ${leave.comments || 'None'}`;
+                if (leave.admin_comments) {
+                    message += `\n\nAdmin Comments: ${leave.admin_comments}`;
+                }
                 alert(message);
                 return;
             }
@@ -1001,20 +1131,31 @@
                 return;
             }
             
-            // If no data, allow adding leave
-            const addLeave = confirm(`${dateStr}\n\nNo record for this day. Would you like to add a leave?`);
+            const addLeave = confirm(`${dateStr}\n\nNo record for this day. Would you like to apply for leave?`);
             if (addLeave) {
-                // Open leave modal - you need to implement this
-                // openLeaveModal(dateStr);
-                alert('Leave feature coming soon!');
+                openLeaveModal(dateStr);
             }
         }
 
-        // Load leaves
+        // Load leaves - FIXED VERSION
         async function loadLeaves() {
             try {
                 const res = await fetch('/api/leaves');
-                leaveData = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    console.error('Error loading leaves:', data.error);
+                    leaveData = {};
+                    return;
+                }
+                
+                leaveData = data;
+                
             } catch (e) {
                 console.error('Error loading leaves:', e);
                 leaveData = {};
@@ -1027,13 +1168,8 @@
                 const res = await fetch('/api/holidays/current-month');
                 const data = await res.json();
                 
-                // Update holiday count
-                document.getElementById('holidayCount').innerHTML = `
-                    <div class="holiday-count-number">${data.total_count}</div>
-                    <div class="holiday-count-text">Holidays in ${data.month}</div>
-                `;
+                document.getElementById('holidayCount').textContent = data.total_count;
                 
-                // Render holiday list
                 const holidayList = document.getElementById('holidayList');
                 
                 if (data.holidays.length === 0) {
@@ -1043,17 +1179,16 @@
                 }
                 
                 holidayList.innerHTML = data.holidays.map(holiday => `
-                    <div class="holiday-item ${holiday.type}">
-                        <div class="holiday-date">
-                            <span class="holiday-day-badge">${holiday.day}</span>
-                            <span class="holiday-date-text">${formatHolidayDate(holiday.date)}</span>
+                    <div style="background: #ffffff; border-radius: 14px; padding: 16px; margin-bottom: 12px; border-left: 4px solid ${holiday.type === 'general' ? '#0071e3' : holiday.type === 'restricted' ? '#ff9500' : holiday.type === 'special' ? '#34c759' : '#af52de'};">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span style="background: #f5f5f7; padding: 8px 12px; border-radius: 8px; font-size: 0.75em; font-weight: 700; color: #1d1d1f; min-width: 80px; text-align: center;">${holiday.day}</span>
+                            <span style="font-size: 0.85em; color: #86868b; font-weight: 600;">${formatHolidayDate(holiday.date)}</span>
                         </div>
-                        <div class="holiday-name">${holiday.name}</div>
-                        <span class="holiday-type ${holiday.type}">${holiday.type}</span>
+                        <div style="font-size: 0.95em; color: #1d1d1f; font-weight: 600; margin-bottom: 4px;">${holiday.name}</div>
+                        <span style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.7em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: ${holiday.type === 'general' ? '#e8f4fd' : holiday.type === 'restricted' ? '#fff3cd' : holiday.type === 'special' ? '#d1f4e0' : '#f3e5f5'}; color: ${holiday.type === 'general' ? '#0071e3' : holiday.type === 'restricted' ? '#ff9500' : holiday.type === 'special' ? '#34c759' : '#af52de'};">${holiday.type}</span>
                     </div>
                 `).join('');
                 
-                // Store holidays for calendar rendering
                 holidayData = {};
                 data.holidays.forEach(h => {
                     holidayData[h.date] = h;
@@ -1066,7 +1201,6 @@
             }
         }
 
-        // Load holidays for specific month
         async function loadMonthHolidays() {
             try {
                 const year = currentMonth.getFullYear();
@@ -1074,7 +1208,6 @@
                 const res = await fetch(`/api/holidays?year=2026&month=${month}`);
                 const data = await res.json();
                 
-                // Clear and update holiday data for the current month
                 holidayData = {};
                 Object.entries(data.holidays).forEach(([date, info]) => {
                     holidayData[date] = {
@@ -1089,33 +1222,235 @@
             }
         }
 
-        // Format holiday date
         function formatHolidayDate(dateStr) {
             const date = new Date(dateStr);
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
             return date.toLocaleDateString('en-US', options);
         }
 
-        // Render history table
-        function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            const recent = historyRecords.slice(0, 30);
-            tbody.innerHTML = recent.map(r => {
-                const leave = leaveData[r.date];
-                const status = leave ? leave.type : (r.login_time !== 'N/A' ? 'Present' : 'Absent');
-                const cls = leave ? 'status-badge' : (r.login_time !== 'N/A' ? 'status-active' : 'status-inactive');
-                return `<tr>
-                    <td><strong>${r.date}</strong></td>
-                    <td>${r.login_time}</td>
-                    <td>${r.logout_time}</td>
-                    <td><strong>${r.hours}</strong></td>
-                    <td><span class="status-badge ${cls}">${status}</span></td>
-                </tr>`;
-            }).join('') || '<tr><td colspan="5" style="text-align:center;color:#86868b;padding:20px;">No records found</td></tr>';
+        // Leave Modal Functions - FIXED VERSION
+        function openLeaveModal(dateStr = null) {
+            const modal = document.getElementById('leaveModal');
+            modal.classList.add('active');
+            
+            const dateInput = document.getElementById('leaveDate');
+            
+            if (dateStr) {
+                dateInput.value = dateStr;
+            } else {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                dateInput.value = tomorrow.toISOString().split('T')[0];
+            }
+            
+            const today = new Date();
+            dateInput.min = today.toISOString().split('T')[0];
+            
+            document.getElementById('leaveType').value = '';
+            document.getElementById('leaveComments').value = '';
         }
+
+        function closeLeaveModal() {
+            document.getElementById('leaveModal').classList.remove('active');
+            document.getElementById('leaveForm').reset();
+        }
+
+        // Submit Leave - COMPLETE FIXED VERSION
+        async function submitLeave(event) {
+            event.preventDefault();
+            
+            const date = document.getElementById('leaveDate').value;
+            const type = document.getElementById('leaveType').value;
+            const comments = document.getElementById('leaveComments').value;
+            
+            if (!date) {
+                showAlert('Please select a leave date', 'danger');
+                return;
+            }
+            
+            if (!type) {
+                showAlert('Please select a leave type', 'danger');
+                return;
+            }
+            
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                showAlert('Cannot apply for leave in the past', 'danger');
+                return;
+            }
+            
+            const submitBtn = document.querySelector('#leaveForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/leave/apply', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        date: date, 
+                        type: type, 
+                        comments: comments 
+                    })
+                });
+                
+                let data;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Server returned invalid response');
+                }
+                
+                if (response.ok && data.ok) {
+                    showAlert('✅ ' + data.message, 'success');
+                    closeLeaveModal();
+                    await loadLeaves();
+                    renderCalendar();
+                } else {
+                    const errorMsg = data.error || 'Failed to submit leave application';
+                    showAlert('❌ ' + errorMsg, 'danger');
+                }
+                
+            } catch (err) {
+                console.error('Leave submission error:', err);
+                showAlert('Failed to submit leave application. Please try again.', 'danger');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Notifications
+        function renderNotifications(notifications) {
+            const list = document.getElementById('notificationList');
+            
+            if (notifications.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #86868b;">
+                        <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 16px; opacity: 0.3;"></i>
+                        <p>No notifications</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = notifications.map(notif => {
+                const statusColor = notif.status === 'approved' ? '#34c759' : '#ff3b30';
+                const statusIcon = notif.status === 'approved' ? 'check-circle' : 'times-circle';
+                
+                return `
+                    <div class="notification-item unread">
+                        <div class="notification-date">${formatNotificationDate(notif.updated_at)}</div>
+                        <div class="notification-message">
+                            <i class="fas fa-${statusIcon}" style="color: ${statusColor};"></i>
+                            <strong>Leave ${notif.status.toUpperCase()}</strong> for ${notif.date}
+                        </div>
+                        <div style="font-size: 0.85em; color: #86868b; margin: 8px 0;">
+                            <strong>Type:</strong> ${notif.leave_type}
+                        </div>
+                        ${notif.admin_comments ? `
+                            <div style="background: #f5f5f7; padding: 12px; border-radius: 8px; margin: 8px 0;">
+                                <strong>Admin Comments:</strong><br>
+                                ${notif.admin_comments}
+                            </div>
+                        ` : ''}
+                        <div class="notification-actions">
+                            <button onclick="markAsRead('${notif.id}')" style="background: #0071e3; color: white; font-weight: 600;">
+                                <i class="fas fa-check"></i> Mark as Read
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatNotificationDate(dateStr) {
+            if (!dateStr) return 'Just now';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        async function markAsRead(notifId) {
+            try {
+                await fetch(`/api/notifications/${notifId}/read`, { method: 'POST' });
+                await checkNotifications();
+                await loadLeaves();
+                renderCalendar();
+                showAlert('Notification marked as read', 'success');
+            } catch (err) {
+                console.error('Error marking notification as read:', err);
+            }
+        }
+
+        function toggleNotificationPanel() {
+            document.getElementById('notificationPanel').classList.toggle('active');
+        }
+
+        async function checkNotifications() {
+            try {
+                const res = await fetch('/api/notifications');
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    console.error('Error loading notifications:', data.error);
+                    return;
+                }
+                
+                const notifications = data.notifications || [];
+                const unreadCount = notifications.filter(n => !n.user_notified).length;
+                
+                const badge = document.getElementById('notificationBadge');
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+                
+                renderNotifications(notifications);
+                
+            } catch (e) {
+                console.error('Error checking notifications:', e);
+            }
+        }
+
+        // Close modals when clicking outside
+        document.getElementById('leaveModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLeaveModal();
+            }
+        });
 
         // Initialize dashboard
         loadDashboardData();
+        
+        // Check for notifications every 30 seconds
+        setInterval(checkNotifications, 30000);
     </script>
 </body>
 </html>

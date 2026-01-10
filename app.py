@@ -1,3 +1,4 @@
+#updated
 from flask import Flask, render_template, redirect, url_for, request, flash, send_file, jsonify
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
@@ -663,9 +664,12 @@ def get_dashboard_data():
         return jsonify({"error": str(e)}), 500
 
 # Leave Management API - FIXED VERSION
+# Replace the /api/leave/apply route in your Flask app with this fixed version
+
 @app.route("/api/leave/apply", methods=["POST"])
 @login_required
 def apply_leave():
+    """Fixed leave application endpoint"""
     if current_user.role != "intern":
         return jsonify({"error": "Only interns can apply for leave"}), 403
     
@@ -682,12 +686,16 @@ def apply_leave():
         leave_type = data.get("type")
         comments = data.get("comments", "")
         
+        # Validate required fields
         if not leave_date or not leave_type:
             return jsonify({"error": "Date and type are required"}), 400
         
-        # Check if date is valid
+        # Validate date format
         try:
-            datetime.strptime(leave_date, "%Y-%m-%d")
+            parsed_date = datetime.strptime(leave_date, "%Y-%m-%d")
+            # Check if date is in the past (except today)
+            if parsed_date.date() < date.today():
+                return jsonify({"error": "Cannot apply for leave in the past"}), 400
         except ValueError:
             return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
         
@@ -698,16 +706,30 @@ def apply_leave():
         })
         
         if existing:
-            if existing.get("status") == "pending":
-                return jsonify({"error": "Leave already pending for this date"}), 400
-            elif existing.get("status") in ["approved", "denied"]:
-                return jsonify({"error": f"Leave already {existing.get('status')} for this date"}), 400
+            status = existing.get("status", "unknown")
+            if status == "pending":
+                return jsonify({"error": "You already have a pending leave application for this date"}), 400
+            elif status == "approved":
+                return jsonify({"error": "You already have an approved leave for this date"}), 400
+            elif status == "denied":
+                # Allow reapplication if previously denied
+                mongo.db.leave_applications.delete_one({"_id": existing["_id"]})
+        
+        # Check if it's a holiday
+        if leave_date in UNIVERSITY_HOLIDAYS_2026:
+            holiday = UNIVERSITY_HOLIDAYS_2026[leave_date]
+            return jsonify({"error": f"This is already a holiday: {holiday['name']}"}), 400
+        
+        # Check if it's a weekend (Saturday/Sunday)
+        date_obj = datetime.strptime(leave_date, "%Y-%m-%d")
+        if date_obj.weekday() in [5, 6]:  # 5=Saturday, 6=Sunday
+            return jsonify({"error": "Cannot apply for leave on weekends"}), 400
         
         # Create leave application
         leave_doc = {
             "user_id": ObjectId(current_user.id),
             "username": current_user.username,
-            "user_email": current_user.email,
+            "user_email": current_user.email or "",
             "date": leave_date,
             "type": leave_type,
             "comments": comments,
@@ -719,26 +741,65 @@ def apply_leave():
         
         result = mongo.db.leave_applications.insert_one(leave_doc)
         
-        # Send email to admin
-        if current_user.email:
-            send_leave_application_email_to_admin(
-                current_user.username,
-                current_user.email,
-                leave_date,
-                leave_type,
-                comments
-            )
+        # Send email to admin (non-blocking)
+        try:
+            if current_user.email:
+                send_leave_application_email_to_admin(
+                    current_user.username,
+                    current_user.email,
+                    leave_date,
+                    leave_type,
+                    comments
+                )
+        except Exception as email_error:
+            print(f"Failed to send email notification: {email_error}")
+            # Don't fail the request if email fails
         
         return jsonify({
             "ok": True, 
-            "message": "Leave application submitted successfully. Admin will be notified.",
+            "message": "Leave application submitted successfully. Admin will review your request.",
             "leave_id": str(result.inserted_id)
-        })
+        }), 200
         
     except Exception as e:
-        print(f"Error applying leave: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error in apply_leave: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
+
+# Also add this helper route to check leave status
+@app.route("/api/leave/check/<leave_date>", methods=["GET"])
+@login_required
+def check_leave(leave_date):
+    """Check if leave already exists for a date"""
+    try:
+        existing = mongo.db.leave_applications.find_one({
+            "user_id": ObjectId(current_user.id),
+            "date": leave_date
+        })
+        
+        if existing:
+            return jsonify({
+                "exists": True,
+                "status": existing.get("status"),
+                "type": existing.get("type"),
+                "comments": existing.get("comments", "")
+            })
+        
+        # Check if it's a holiday
+        if leave_date in UNIVERSITY_HOLIDAYS_2026:
+            holiday = UNIVERSITY_HOLIDAYS_2026[leave_date]
+            return jsonify({
+                "is_holiday": True,
+                "holiday_name": holiday["name"],
+                "holiday_type": holiday["type"]
+            })
+        
+        return jsonify({"exists": False})
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 @app.route("/api/leaves", methods=["GET"])
 @login_required
 def get_all_leaves():
