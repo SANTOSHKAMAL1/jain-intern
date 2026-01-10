@@ -29,6 +29,9 @@ app.config['MAIL_USERNAME'] = 'info.loginpanel@gmail.com'
 app.config['MAIL_PASSWORD'] = 'wedbfepklgtwtugf'
 app.config['MAIL_DEFAULT_SENDER'] = 'info.loginpanel@gmail.com'
 
+# Admin email for leave notifications
+ADMIN_EMAIL = 'admin@jainuniversity.ac.in'
+
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -57,11 +60,8 @@ MOTIVATIONAL_QUOTES = [
     "Wake up with determination. Go to bed with satisfaction."
 ]
 
-# University Holidays 2026 – JAIN (Deemed-to-be University)
-
+# University Holidays 2026
 UNIVERSITY_HOLIDAYS_2026 = {
-
-    # General Government / University Holidays
     "2026-01-15": {"name": "Uttarayana Punyakala / Makara Sankranti", "type": "general"},
     "2026-01-26": {"name": "Republic Day", "type": "general"},
     "2026-03-19": {"name": "Chandramana Ugadi", "type": "general"},
@@ -83,11 +83,7 @@ UNIVERSITY_HOLIDAYS_2026 = {
     "2026-11-10": {"name": "Balipadyami / Deepavali", "type": "general"},
     "2026-11-27": {"name": "Kanakadasa Jayanthi", "type": "general"},
     "2026-12-25": {"name": "Christmas", "type": "general"},
-
-    # Restricted Holiday
     "2026-08-21": {"name": "Varamahalakshmi Vrata", "type": "restricted"},
-
-    # Special Holidays (University following Government Holiday)
     "2026-01-16": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
     "2026-03-20": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
     "2026-04-04": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
@@ -96,8 +92,6 @@ UNIVERSITY_HOLIDAYS_2026 = {
     "2026-08-22": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
     "2026-10-19": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
     "2026-11-09": {"name": "Special Holiday (Govt. Follow-up)", "type": "special"},
-
-    # University-Declared Saturday Holidays
     "2026-01-24": {"name": "4th Saturday Holiday", "type": "saturday"},
     "2026-02-21": {"name": "3rd Saturday Holiday", "type": "saturday"},
     "2026-04-04": {"name": "1st Saturday Holiday", "type": "saturday"},
@@ -108,7 +102,6 @@ UNIVERSITY_HOLIDAYS_2026 = {
     "2026-09-19": {"name": "3rd Saturday Holiday", "type": "saturday"},
     "2026-12-19": {"name": "3rd Saturday Holiday", "type": "saturday"},
 }
-
 
 # User model for Flask-Login
 class User(UserMixin):
@@ -154,7 +147,7 @@ def format_ist_time(dt, format_str="%I:%M %p"):
 
 def haversine_km(lat1, lon1, lat2, lon2):
     """Calculate distance between two coordinates in kilometers"""
-    R = 6371.0  # Earth's radius in km
+    R = 6371.0
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
@@ -166,7 +159,6 @@ def haversine_km(lat1, lon1, lat2, lon2):
 def ensure_admin():
     """Check if current user is admin"""
     if not current_user.is_authenticated or current_user.role != "admin":
-        flash("Admin access required", "danger")
         return False
     return True
 
@@ -204,48 +196,28 @@ def send_login_email(user_email, username, login_time_str):
                 <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <div style="text-align: center; margin-bottom: 30px;">
                         <h1 style="color: #0071e3; margin: 0;">🎉 Login Successful!</h1>
+                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
                     </div>
                     
-                    <div style="background: #f0f8ff; border-left: 4px solid #0071e3; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #333; font-size: 16px;">
-                            <strong>Hello {username},</strong>
-                        </p>
-                        <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
-                            You have successfully logged in to the attendance system.
-                        </p>
+                    <div style="background: #e8f4fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="background: #0071e3; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
+                                {username[0].upper()}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
+                                <div style="font-size: 0.9em; color: #86868b;">Logged in successfully</div>
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
+                            <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Login Time (IST)</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: #0071e3;">{login_time_str}</div>
+                        </div>
                     </div>
                     
-                    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <h3 style="color: #333; margin-top: 0;">📋 Login Details</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 10px 0; color: #666;">
-                                    <strong>Username:</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #333; text-align: right;">
-                                    {username}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px 0; color: #666; border-top: 1px solid #f0f0f0;">
-                                    <strong>Login Time (IST):</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #0071e3; text-align: right; border-top: 1px solid #f0f0f0;">
-                                    <strong>{login_time_str}</strong>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <p style="color: white; font-size: 16px; font-style: italic; margin: 0; text-align: center;">
-                            "{quote}"
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                        <p style="margin: 0;">JAIN University - Intern Attendance System</p>
-                        <p style="margin: 5px 0 0 0;">This is an automated email. Please do not reply.</p>
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
+                        <div style="font-style: italic; color: #6e6e73; margin-bottom: 20px;">"{quote}"</div>
+                        <div style="font-size: 0.8em; color: #86868b;">This is an automated email. Please do not reply.</div>
                     </div>
                 </div>
             </body>
@@ -253,105 +225,61 @@ def send_login_email(user_email, username, login_time_str):
         """
         
         mail.send(msg)
-        print(f"Login email sent successfully to {user_email}")
+        print(f"Login email sent to {user_email}")
         return True
     except Exception as e:
         print(f"Failed to send login email: {e}")
         return False
 
-def send_logout_email(user_email, username, login_time_str, logout_time_str, hours_worked):
-    """Send email notification on logout with working duration"""
+def send_logout_email(user_email, username, login_time_str, logout_time_str, hours):
+    """Send email notification on logout"""
     try:
         quote = random.choice(MOTIVATIONAL_QUOTES)
         msg = Message(
-            subject=f"👋 Logout Successful - {username}",
+            subject=f"📊 Work Summary - {username}",
             recipients=[user_email]
         )
-        
-        # Calculate hours and minutes
-        hours = int(hours_worked)
-        minutes = int((hours_worked - hours) * 60)
         
         msg.html = f"""
         <html>
             <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
                 <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #34c759; margin: 0;">✅ Great Work Today!</h1>
+                        <h1 style="color: #34c759; margin: 0;">📊 Work Summary</h1>
+                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
                     </div>
                     
-                    <div style="background: #f0fff4; border-left: 4px solid #34c759; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #333; font-size: 16px;">
-                            <strong>Hello {username},</strong>
-                        </p>
-                        <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
-                            You have successfully logged out. Here's your work summary for today.
-                        </p>
+                    <div style="background: #e8f4fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="background: #34c759; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
+                                {username[0].upper()}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
+                                <div style="font-size: 0.9em; color: #86868b;">Daily attendance summary</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+                            <div style="background: white; border-radius: 6px; padding: 12px;">
+                                <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Login Time</div>
+                                <div style="font-weight: bold; color: #1d1d1f;">{login_time_str}</div>
+                            </div>
+                            <div style="background: white; border-radius: 6px; padding: 12px;">
+                                <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Logout Time</div>
+                                <div style="font-weight: bold; color: #1d1d1f;">{logout_time_str}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #d1f4e0; border-radius: 6px; padding: 15px; text-align: center; margin-top: 10px;">
+                            <div style="font-size: 0.8em; color: #0a7d3e; margin-bottom: 4px;">Total Hours Worked</div>
+                            <div style="font-size: 2em; font-weight: bold; color: #0a7d3e;">{hours:.1f} hours</div>
+                        </div>
                     </div>
                     
-                    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <h3 style="color: #333; margin-top: 0;">📊 Today's Work Summary</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 10px 0; color: #666;">
-                                    <strong>Username:</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #333; text-align: right;">
-                                    {username}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px 0; color: #666; border-top: 1px solid #f0f0f0;">
-                                    <strong>Login Time (IST):</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #0071e3; text-align: right; border-top: 1px solid #f0f0f0;">
-                                    {login_time_str}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px 0; color: #666; border-top: 1px solid #f0f0f0;">
-                                    <strong>Logout Time (IST):</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #34c759; text-align: right; border-top: 1px solid #f0f0f0;">
-                                    {logout_time_str}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px 0; color: #666; border-top: 1px solid #f0f0f0;">
-                                    <strong>Working Duration:</strong>
-                                </td>
-                                <td style="padding: 10px 0; text-align: right; border-top: 1px solid #f0f0f0;">
-                                    <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 16px;">
-                                        {hours}h {minutes}m
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 10px 0; color: #666; border-top: 1px solid #f0f0f0;">
-                                    <strong>Total Hours:</strong>
-                                </td>
-                                <td style="padding: 10px 0; color: #333; text-align: right; border-top: 1px solid #f0f0f0; font-size: 18px;">
-                                    <strong>{hours_worked:.2f} hours</strong>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <p style="color: white; font-size: 16px; font-style: italic; margin: 0; text-align: center;">
-                            "{quote}"
-                        </p>
-                    </div>
-                    
-                    <div style="background: #fff9e6; border: 1px solid #ffd700; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center;">
-                        <p style="margin: 0; color: #333; font-size: 14px;">
-                            <strong>🌟 Keep up the excellent work!</strong>
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                        <p style="margin: 0;">JAIN University - Intern Attendance System</p>
-                        <p style="margin: 5px 0 0 0;">This is an automated email. Please do not reply.</p>
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
+                        <div style="font-style: italic; color: #6e6e73; margin-bottom: 20px;">"{quote}"</div>
+                        <div style="font-size: 0.8em; color: #86868b;">This is an automated email. Please do not reply.</div>
                     </div>
                 </div>
             </body>
@@ -359,10 +287,165 @@ def send_logout_email(user_email, username, login_time_str, logout_time_str, hou
         """
         
         mail.send(msg)
-        print(f"Logout email sent successfully to {user_email}")
+        print(f"Logout email sent to {user_email}")
         return True
     except Exception as e:
         print(f"Failed to send logout email: {e}")
+        return False
+
+def send_leave_application_email_to_admin(username, user_email, leave_date, leave_type, comments):
+    """Send email to admin about new leave application"""
+    try:
+        msg = Message(
+            subject=f"📋 New Leave Application - {username}",
+            recipients=[ADMIN_EMAIL]
+        )
+        
+        msg.html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #ff9500; margin: 0;">📋 New Leave Application</h1>
+                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
+                    </div>
+                    
+                    <div style="background: #fff3cd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="background: #ff9500; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
+                                {username[0].upper()}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
+                                <div style="font-size: 0.9em; color: #86868b;">{user_email}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 6px; padding: 15px; margin-bottom: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Date</div>
+                                    <div style="font-weight: bold; color: #1d1d1f;">{leave_date}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Type</div>
+                                    <div style="font-weight: bold; color: #ff9500;">{leave_type}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {comments if comments else ''}
+                    </div>
+                    
+                    <div style="background: #e8f4fd; border-radius: 6px; padding: 15px; text-align: center;">
+                        <p style="margin: 0; color: #0071e3; font-weight: 600;">Action Required: Please review this leave application in the Admin Dashboard</p>
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
+                        <div style="font-size: 0.8em; color: #86868b;">
+                            <p style="margin: 0;">JAIN University - Admin Panel</p>
+                            <p style="margin: 5px 0 0 0;">This is an automated notification. Please do not reply.</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+        
+        if comments:
+            msg.html = msg.html.replace("{comments if comments else ''}", f"""
+                <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
+                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Reason/Comments</div>
+                    <div style="font-weight: normal; color: #1d1d1f;">{comments}</div>
+                </div>
+            """)
+        
+        mail.send(msg)
+        print(f"Leave application email sent to admin")
+        return True
+    except Exception as e:
+        print(f"Failed to send leave application email: {e}")
+        return False
+
+def send_leave_status_email_to_user(user_email, username, leave_date, leave_type, status, admin_comments):
+    """Send email to user about leave status update"""
+    try:
+        status_color = "#34c759" if status == "approved" else "#ff3b30"
+        status_icon = "✅" if status == "approved" else "❌"
+        status_title = "Leave Approved" if status == "approved" else "Leave Denied"
+        
+        msg = Message(
+            subject=f"{status_icon} Leave {status.capitalize()} - {username}",
+            recipients=[user_email]
+        )
+        
+        msg.html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: {status_color}; margin: 0;">{status_icon} {status_title}</h1>
+                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
+                    </div>
+                    
+                    <div style="background: {'#d1f4e0' if status == 'approved' else '#ffe5e5'}; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="background: {status_color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
+                                {username[0].upper()}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
+                                <div style="font-size: 0.9em; color: #86868b;">Leave status has been updated</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 6px; padding: 15px; margin-bottom: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Date</div>
+                                    <div style="font-weight: bold; color: #1d1d1f;">{leave_date}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Type</div>
+                                    <div style="font-weight: bold; color: #ff9500;">{leave_type}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
+                            <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Status</div>
+                            <div style="font-weight: bold; color: {status_color}; font-size: 1.2em;">
+                                {status_icon} {status.upper()}
+                            </div>
+                        </div>
+                        
+                        {admin_comments if admin_comments else ''}
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
+                        <div style="font-size: 0.8em; color: #86868b;">
+                            <p style="margin: 0;">JAIN University - Intern Attendance System</p>
+                            <p style="margin: 5px 0 0 0;">This is an automated email. Please do not reply.</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+        
+        if admin_comments:
+            msg.html = msg.html.replace("{admin_comments if admin_comments else ''}", f"""
+                <div style="background: #f5f5f7; border-radius: 6px; padding: 15px; margin-top: 10px;">
+                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Admin Comments</div>
+                    <div style="font-weight: normal; color: #1d1d1f;">{admin_comments}</div>
+                </div>
+            """)
+        
+        mail.send(msg)
+        print(f"Leave status email sent to {user_email}")
+        return True
+    except Exception as e:
+        print(f"Failed to send leave status email: {e}")
         return False
 
 # Routes: Authentication
@@ -470,7 +553,6 @@ def attendance_login():
         "created_at": now_utc
     })
     
-    # Send login email
     login_time_str = format_ist_time(now_utc, "%Y-%m-%d %I:%M:%S %p")
     if current_user.email:
         send_login_email(current_user.email, current_user.username, login_time_str)
@@ -510,7 +592,6 @@ def attendance_logout():
 
     mongo.db.attendance.update_one({"_id": rec["_id"]}, {"$set": updates})
     
-    # Send logout email with work summary
     if current_user.email and duration is not None:
         login_time_str = format_ist_time(login_time, "%Y-%m-%d %I:%M:%S %p")
         logout_time_str = format_ist_time(logout_time, "%Y-%m-%d %I:%M:%S %p")
@@ -581,15 +662,22 @@ def get_dashboard_data():
         print(f"Error in dashboard data API: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Leave Management API
-@app.route("/api/leave", methods=["POST"])
+# Leave Management API - FIXED VERSION
+@app.route("/api/leave/apply", methods=["POST"])
 @login_required
-def save_leave():
+def apply_leave():
     if current_user.role != "intern":
-        return jsonify({"error": "Only interns can save leave"}), 403
+        return jsonify({"error": "Only interns can apply for leave"}), 403
     
     try:
+        # Check if request is JSON
+        if not request.is_json:
+            return jsonify({"error": "Content-Type must be application/json"}), 415
+        
         data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
         leave_date = data.get("date")
         leave_type = data.get("type")
         comments = data.get("comments", "")
@@ -597,28 +685,58 @@ def save_leave():
         if not leave_date or not leave_type:
             return jsonify({"error": "Date and type are required"}), 400
         
-        mongo.db.leaves.update_one(
-            {
-                "user_id": ObjectId(current_user.id),
-                "date": leave_date
-            },
-            {
-                "$set": {
-                    "user_id": ObjectId(current_user.id),
-                    "username": current_user.username,
-                    "date": leave_date,
-                    "type": leave_type,
-                    "comments": comments,
-                    "updated_at": datetime.utcnow()
-                }
-            },
-            upsert=True
-        )
+        # Check if date is valid
+        try:
+            datetime.strptime(leave_date, "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
         
-        return jsonify({"ok": True, "message": "Leave saved successfully"})
+        # Check for existing leave application
+        existing = mongo.db.leave_applications.find_one({
+            "user_id": ObjectId(current_user.id),
+            "date": leave_date
+        })
+        
+        if existing:
+            if existing.get("status") == "pending":
+                return jsonify({"error": "Leave already pending for this date"}), 400
+            elif existing.get("status") in ["approved", "denied"]:
+                return jsonify({"error": f"Leave already {existing.get('status')} for this date"}), 400
+        
+        # Create leave application
+        leave_doc = {
+            "user_id": ObjectId(current_user.id),
+            "username": current_user.username,
+            "user_email": current_user.email,
+            "date": leave_date,
+            "type": leave_type,
+            "comments": comments,
+            "status": "pending",
+            "applied_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "user_notified": False
+        }
+        
+        result = mongo.db.leave_applications.insert_one(leave_doc)
+        
+        # Send email to admin
+        if current_user.email:
+            send_leave_application_email_to_admin(
+                current_user.username,
+                current_user.email,
+                leave_date,
+                leave_type,
+                comments
+            )
+        
+        return jsonify({
+            "ok": True, 
+            "message": "Leave application submitted successfully. Admin will be notified.",
+            "leave_id": str(result.inserted_id)
+        })
         
     except Exception as e:
-        print(f"Error saving leave: {e}")
+        print(f"Error applying leave: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/leaves", methods=["GET"])
@@ -629,7 +747,7 @@ def get_all_leaves():
     
     try:
         cutoff = (date.today() - timedelta(days=90)).isoformat()
-        leaves = list(mongo.db.leaves.find({
+        leaves = list(mongo.db.leave_applications.find({
             "user_id": ObjectId(current_user.id),
             "date": {"$gte": cutoff}
         }))
@@ -638,7 +756,9 @@ def get_all_leaves():
         for leave in leaves:
             result[leave["date"]] = {
                 "type": leave.get("type"),
-                "comments": leave.get("comments", "")
+                "comments": leave.get("comments", ""),
+                "status": leave.get("status", "pending"),
+                "admin_comments": leave.get("admin_comments", "")
             }
         
         return jsonify(result)
@@ -647,10 +767,139 @@ def get_all_leaves():
         print(f"Error fetching leaves: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Holidays API
+@app.route("/api/notifications")
+@login_required
+def get_notifications():
+    if current_user.role != "intern":
+        return jsonify({"error": "Only interns can access notifications"}), 403
+    
+    try:
+        notifications = list(mongo.db.leave_applications.find({
+            "user_id": ObjectId(current_user.id),
+            "status": {"$in": ["approved", "denied"]},
+            "user_notified": {"$ne": True}
+        }).sort("updated_at", -1))
+        
+        result = []
+        for notif in notifications:
+            result.append({
+                "id": str(notif["_id"]),
+                "type": "leave_status",
+                "date": notif.get("date"),
+                "leave_type": notif.get("type"),
+                "status": notif.get("status"),
+                "admin_comments": notif.get("admin_comments", ""),
+                "updated_at": notif.get("updated_at").isoformat() if notif.get("updated_at") else None
+            })
+        
+        return jsonify({"notifications": result})
+        
+    except Exception as e:
+        print(f"Error fetching notifications: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/notifications/<notif_id>/read", methods=["POST"])
+@login_required
+def mark_notification_read(notif_id):
+    try:
+        mongo.db.leave_applications.update_one(
+            {"_id": ObjectId(notif_id), "user_id": ObjectId(current_user.id)},
+            {"$set": {"user_notified": True}}
+        )
+        return jsonify({"ok": True})
+    except Exception as e:
+        print(f"Error marking notification as read: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/admin/leave-applications")
+@login_required
+def get_leave_applications():
+    if not current_user.is_authenticated or current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        status_filter = request.args.get("status", "all")
+        
+        query = {}
+        if status_filter != "all":
+            query["status"] = status_filter
+        
+        applications = list(mongo.db.leave_applications.find(query).sort("applied_at", -1))
+        
+        result = []
+        for app in applications:
+            result.append({
+                "id": str(app["_id"]),
+                "username": app.get("username"),
+                "user_email": app.get("user_email"),
+                "date": app.get("date"),
+                "type": app.get("type"),
+                "comments": app.get("comments", ""),
+                "status": app.get("status", "pending"),
+                "admin_comments": app.get("admin_comments", ""),
+                "applied_at": app.get("applied_at").isoformat() if app.get("applied_at") else None,
+                "updated_at": app.get("updated_at").isoformat() if app.get("updated_at") else None
+            })
+        
+        return jsonify({"applications": result})
+        
+    except Exception as e:
+        print(f"Error fetching leave applications: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/admin/leave/<leave_id>/update", methods=["POST"])
+@login_required
+def update_leave_status(leave_id):
+    if not current_user.is_authenticated or current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        if not request.is_json:
+            return jsonify({"error": "Content-Type must be application/json"}), 415
+        
+        data = request.get_json()
+        status = data.get("status")
+        admin_comments = data.get("admin_comments", "")
+        
+        if status not in ["approved", "denied"]:
+            return jsonify({"error": "Invalid status"}), 400
+        
+        leave_app = mongo.db.leave_applications.find_one({"_id": ObjectId(leave_id)})
+        if not leave_app:
+            return jsonify({"error": "Leave application not found"}), 404
+        
+        mongo.db.leave_applications.update_one(
+            {"_id": ObjectId(leave_id)},
+            {
+                "$set": {
+                    "status": status,
+                    "admin_comments": admin_comments,
+                    "updated_at": datetime.utcnow(),
+                    "updated_by": current_user.username,
+                    "user_notified": False
+                }
+            }
+        )
+        
+        user_email = leave_app.get("user_email")
+        if user_email:
+            send_leave_status_email_to_user(
+                user_email,
+                leave_app.get("username"),
+                leave_app.get("date"),
+                leave_app.get("type"),
+                status,
+                admin_comments
+            )
+        
+        return jsonify({"ok": True, "message": f"Leave {status} successfully. User will be notified via email."})
+        
+    except Exception as e:
+        print(f"Error updating leave status: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/api/holidays")
 def get_holidays():
-    """Get holidays for a specific year and month"""
     try:
         year = request.args.get('year', type=int, default=2026)
         month = request.args.get('month', type=int, default=None)
@@ -665,7 +914,6 @@ def get_holidays():
             if month and holiday_date.month != month:
                 continue
             
-            # Format holiday info
             filtered_holidays[date_str] = {
                 "name": info["name"],
                 "type": info["type"],
@@ -687,13 +935,11 @@ def get_holidays():
 
 @app.route("/api/holidays/current-month")
 def get_current_month_holidays():
-    """Get holidays for the current month"""
     try:
         today = date.today()
         current_year = today.year
         current_month = today.month
         
-        # If we're in 2025, show 2026 holidays for testing
         if current_year < 2026:
             current_year = 2026
         
@@ -710,7 +956,6 @@ def get_current_month_holidays():
                     "month": holiday_date.strftime("%B")
                 })
         
-        # Sort by date
         holidays_list.sort(key=lambda x: x["date"])
         
         return jsonify({
@@ -724,11 +969,10 @@ def get_current_month_holidays():
         print(f"Error fetching current month holidays: {e}")
         return jsonify({"error": str(e)}), 500
 
-# User Statistics API
 @app.route("/api/admin/user-stats/<user_id>")
 @login_required
 def get_user_stats(user_id):
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return jsonify({"error": "Admin access required"}), 403
     
     try:
@@ -748,9 +992,10 @@ def get_user_stats(user_id):
             "date": {"$gte": first_day.isoformat(), "$lte": last_day.isoformat()}
         })
         
-        leaves_count = mongo.db.leaves.count_documents({
+        leaves_count = mongo.db.leave_applications.count_documents({
             "user_id": ObjectId(user_id),
-            "date": {"$gte": first_day.isoformat(), "$lte": last_day.isoformat()}
+            "date": {"$gte": first_day.isoformat(), "$lte": last_day.isoformat()},
+            "status": "approved"
         })
         
         total_working_days = mongo.db.attendance.count_documents({
@@ -769,11 +1014,10 @@ def get_user_stats(user_id):
         print(f"Error fetching user stats: {e}")
         return jsonify({"error": str(e)}), 500
 
-# ADMIN CALENDAR API
 @app.route("/api/admin/calendar-data")
 @login_required
 def get_admin_calendar_data():
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return jsonify({"error": "Admin access required"}), 403
     
     try:
@@ -792,7 +1036,7 @@ def get_admin_calendar_data():
             query["user_id"] = {"$in": [ObjectId(uid) for uid in user_ids if uid]}
         
         attendance = list(mongo.db.attendance.find(query))
-        leaves = list(mongo.db.leaves.find(query))
+        leaves = list(mongo.db.leave_applications.find({**query, "status": "approved"}))
         
         calendar_data = {}
         
@@ -823,7 +1067,8 @@ def get_admin_calendar_data():
             calendar_data[username][date_str] = {
                 "type": "leave",
                 "leave_type": leave.get("type"),
-                "comments": leave.get("comments", "")
+                "comments": leave.get("comments", ""),
+                "status": leave.get("status")
             }
         
         return jsonify({
@@ -836,7 +1081,6 @@ def get_admin_calendar_data():
         print(f"Error in admin calendar API: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Dashboards
 @app.route("/user/dashboard")
 @login_required
 def user_dashboard():
@@ -853,12 +1097,12 @@ def attendance_history():
     history = [serialize_attendance(r) for r in raw_history]
     return render_template("attendance_history.html", history=history)
 
-# Notifications
 @app.route("/admin/notifications", methods=["GET","POST"])
 @login_required
 def admin_notifications():
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return redirect(url_for("user_dashboard"))
+    
     if request.method == "POST":
         to_user = request.form.get("to_user")
         message = request.form.get("message")
@@ -871,6 +1115,7 @@ def admin_notifications():
         })
         flash("Notification sent", "success")
         return redirect(url_for("admin_notifications"))
+    
     notifications = list(mongo.db.notifications.find().sort("timestamp", -1))
     users = list(mongo.db.users.find())
     return render_template("notifications.html", notifications=notifications, users=users)
@@ -890,11 +1135,10 @@ def reply_notification(nid):
     flash("Reply sent", "success")
     return redirect(url_for("view_notifications") if current_user.role=="intern" else url_for("admin_notifications"))
 
-# Admin dashboard
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return redirect(url_for("user_dashboard"))
     
     users_raw = list(mongo.db.users.find())
@@ -907,15 +1151,20 @@ def admin_dashboard():
     recent_serialized = [serialize_attendance(r) for r in recent]
     
     cutoff = (date.today() - timedelta(days=90)).isoformat()
-    leaves = list(mongo.db.leaves.find({"date": {"$gte": cutoff}}).sort("date", -1))
+    leaves = list(mongo.db.leave_applications.find({"date": {"$gte": cutoff}}).sort("applied_at", -1))
     
     leaves_data = []
     for leave in leaves:
         leaves_data.append({
+            "id": str(leave["_id"]),
             "username": leave.get("username"),
+            "user_email": leave.get("user_email"),
             "date": leave.get("date"),
             "type": leave.get("type"),
             "comments": leave.get("comments", ""),
+            "status": leave.get("status", "pending"),
+            "admin_comments": leave.get("admin_comments", ""),
+            "applied_at": leave.get("applied_at"),
             "updated_at": leave.get("updated_at")
         })
     
@@ -927,14 +1176,16 @@ def admin_dashboard():
 @app.route("/admin/export", methods=["GET"])
 @login_required
 def admin_export():
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return redirect(url_for("admin_dashboard"))
+    
     start = request.args.get("start")
     end = request.args.get("end")
     if not start:
         start = (date.today() - timedelta(days=30)).isoformat()
     if not end:
         end = date.today().isoformat()
+    
     recs = list(mongo.db.attendance.find({"date": {"$gte": start, "$lte": end}}).sort([("date",1), ("username",1)]))
     rows = []
     for r in recs:
@@ -947,6 +1198,7 @@ def admin_export():
             "logout_time": format_ist_time(lot, "%Y-%m-%d %I:%M:%S %p") if lot else "",
             "hours": r.get("hours", 0) or 0
         })
+    
     df = pd.DataFrame(rows)
     buf = io.StringIO()
     df.to_csv(buf, index=False)
@@ -960,17 +1212,27 @@ def admin_export():
 @app.route("/admin/create_user", methods=["POST"])
 @login_required
 def admin_create_user():
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return redirect(url_for("user_dashboard"))
+    
     username = request.form.get("username").strip()
     password = request.form.get("password")
     role = request.form.get("role", "intern")
     email = request.form.get("email", "")
+    
     if mongo.db.users.find_one({"username": username}):
         flash("User exists", "danger")
         return redirect(url_for("admin_dashboard"))
+    
     hashed = bcrypt.generate_password_hash(password).decode("utf-8")
-    mongo.db.users.insert_one({"username": username, "password": hashed, "role": role, "email": email, "created_at": datetime.utcnow()})
+    mongo.db.users.insert_one({
+        "username": username, 
+        "password": hashed, 
+        "role": role, 
+        "email": email, 
+        "created_at": datetime.utcnow()
+    })
+    
     flash("User created", "success")
     return redirect(url_for("admin_dashboard"))
 
@@ -978,7 +1240,7 @@ def admin_create_user():
 @app.route("/admin/delete_user/<user_id>", methods=["POST"])
 @login_required
 def admin_delete_user(user_id):
-    if not ensure_admin():
+    if not current_user.is_authenticated or current_user.role != "admin":
         return jsonify({"error": "Admin access required"}), 403
     
     try:
@@ -991,7 +1253,7 @@ def admin_delete_user(user_id):
         
         mongo.db.users.delete_one({"_id": ObjectId(user_id)})
         mongo.db.attendance.delete_many({"user_id": ObjectId(user_id)})
-        mongo.db.leaves.delete_many({"user_id": ObjectId(user_id)})
+        mongo.db.leave_applications.delete_many({"user_id": ObjectId(user_id)})
         
         return jsonify({"ok": True, "message": f"User {user['username']} deleted successfully"})
         
@@ -1005,4 +1267,4 @@ def health():
     return {"status":"ok"}
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)
