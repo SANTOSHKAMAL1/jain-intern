@@ -1,4 +1,3 @@
-#updated
 from flask import Flask, render_template, redirect, url_for, request, flash, send_file, jsonify
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
@@ -13,6 +12,7 @@ import math
 import os
 import random
 import json
+import requests
 
 from config import Config
 
@@ -30,7 +30,10 @@ app.config['MAIL_USERNAME'] = 'info.loginpanel@gmail.com'
 app.config['MAIL_PASSWORD'] = 'wedbfepklgtwtugf'
 app.config['MAIL_DEFAULT_SENDER'] = 'info.loginpanel@gmail.com'
 
-# Admin email for leave notifications
+# Google Maps API Key
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+
+# Admin email
 ADMIN_EMAIL = 'admin@jainuniversity.ac.in'
 
 mongo = PyMongo(app)
@@ -46,6 +49,17 @@ ALLOWED_RADIUS_KM = 50
 
 # IST Timezone
 IST = pytz.timezone('Asia/Kolkata')
+
+# Working hours configuration
+DEFAULT_WORK_HOURS = 8
+MIN_WORK_HOURS = 2
+
+# SHIFT_TIMINGS
+SHIFT_TIMINGS = {
+    "shift1": {"name": "Shift 1", "start": None, "end": None, "hours": 0},
+    "shift2": {"name": "Shift 2", "start": None, "end": None, "hours": 0},
+    "normal": {"name": "Normal Login", "start": None, "end": None, "hours": 0}
+}
 
 # Motivational Quotes
 MOTIVATIONAL_QUOTES = [
@@ -63,7 +77,7 @@ MOTIVATIONAL_QUOTES = [
 
 # University Holidays 2026
 UNIVERSITY_HOLIDAYS_2026 = {
-    "2026-01-15": {"name": "Uttarayana Punyakala / Makara Sankranti", "type": "general"},
+   "2026-01-15": {"name": "Uttarayana Punyakala / Makara Sankranti", "type": "general"},
     "2026-01-26": {"name": "Republic Day", "type": "general"},
     "2026-03-19": {"name": "Chandramana Ugadi", "type": "general"},
     "2026-03-21": {"name": "Khutub-E-Ramzan", "type": "general"},
@@ -104,13 +118,15 @@ UNIVERSITY_HOLIDAYS_2026 = {
     "2026-12-19": {"name": "3rd Saturday Holiday", "type": "saturday"},
 }
 
-# User model for Flask-Login
+
+# User model
 class User(UserMixin):
     def __init__(self, user_doc):
         self.id = str(user_doc["_id"])
         self.username = user_doc["username"]
         self.role = user_doc.get("role", "intern")
         self.email = user_doc.get("email")
+        self.work_hours = user_doc.get("work_hours", DEFAULT_WORK_HOURS)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -121,11 +137,9 @@ def load_user(user_id):
 
 # Utility functions
 def get_ist_now():
-    """Get current time in IST"""
     return datetime.now(IST)
 
 def utc_to_ist(utc_dt):
-    """Convert UTC datetime to IST"""
     if utc_dt is None:
         return None
     if isinstance(utc_dt, str):
@@ -138,7 +152,6 @@ def utc_to_ist(utc_dt):
     return utc_dt.astimezone(IST)
 
 def format_ist_time(dt, format_str="%I:%M %p"):
-    """Format IST datetime to string"""
     if dt is None:
         return None
     ist_dt = utc_to_ist(dt)
@@ -146,8 +159,28 @@ def format_ist_time(dt, format_str="%I:%M %p"):
         return None
     return ist_dt.strftime(format_str)
 
+def get_address_from_coords(lat, lng):
+    """Get full address from coordinates"""
+    if lat is None or lng is None:
+        return "Address not available"
+    
+    if not GOOGLE_MAPS_API_KEY:
+        return f"Location: {lat:.6f}, {lng:.6f}"
+    
+    try:
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={GOOGLE_MAPS_API_KEY}"
+        response = requests.get(url)
+        data = response.json()
+        
+        if data['status'] == 'OK' and len(data['results']) > 0:
+            return data['results'][0].get('formatted_address', f"Lat: {lat:.6f}, Lng: {lng:.6f}")
+        
+        return f"Lat: {lat:.6f}, Lng: {lng:.6f}"
+    except Exception as e:
+        print(f"Error getting address: {e}")
+        return f"Lat: {lat:.6f}, Lng: {lng:.6f}"
+
 def haversine_km(lat1, lon1, lat2, lon2):
-    """Calculate distance between two coordinates in kilometers"""
     R = 6371.0
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
@@ -157,297 +190,8 @@ def haversine_km(lat1, lon1, lat2, lon2):
     c = 2*math.atan2(math.sqrt(a), math.sqrt(1-a))
     return R * c
 
-def ensure_admin():
-    """Check if current user is admin"""
-    if not current_user.is_authenticated or current_user.role != "admin":
-        return False
-    return True
-
-def serialize_attendance(rec):
-    """Convert attendance record to serializable format"""
-    if not rec:
-        return None
-    out = {
-        "id": str(rec.get("_id")),
-        "user_id": str(rec.get("user_id")) if rec.get("user_id") else None,
-        "username": rec.get("username"),
-        "date": rec.get("date")
-    }
-    lt = rec.get("login_time")
-    out["login_time"] = format_ist_time(lt, "%Y-%m-%d %I:%M:%S %p") if lt else None
-    lot = rec.get("logout_time")
-    out["logout_time"] = format_ist_time(lot, "%Y-%m-%d %I:%M:%S %p") if lot else None
-    out["hours"] = rec.get("hours")
-    out["login_location"] = rec.get("login_location")
-    out["logout_location"] = rec.get("logout_location")
-    return out
-
-def send_login_email(user_email, username, login_time_str):
-    """Send email notification on login"""
-    try:
-        quote = random.choice(MOTIVATIONAL_QUOTES)
-        msg = Message(
-            subject=f"✅ Login Successful - {username}",
-            recipients=[user_email]
-        )
-        
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #0071e3; margin: 0;">🎉 Login Successful!</h1>
-                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
-                    </div>
-                    
-                    <div style="background: #e8f4fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div style="background: #0071e3; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
-                                {username[0].upper()}
-                            </div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
-                                <div style="font-size: 0.9em; color: #86868b;">Logged in successfully</div>
-                            </div>
-                        </div>
-                        <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
-                            <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Login Time (IST)</div>
-                            <div style="font-size: 1.2em; font-weight: bold; color: #0071e3;">{login_time_str}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
-                        <div style="font-style: italic; color: #6e6e73; margin-bottom: 20px;">"{quote}"</div>
-                        <div style="font-size: 0.8em; color: #86868b;">This is an automated email. Please do not reply.</div>
-                    </div>
-                </div>
-            </body>
-        </html>
-        """
-        
-        mail.send(msg)
-        print(f"Login email sent to {user_email}")
-        return True
-    except Exception as e:
-        print(f"Failed to send login email: {e}")
-        return False
-
-def send_logout_email(user_email, username, login_time_str, logout_time_str, hours):
-    """Send email notification on logout"""
-    try:
-        quote = random.choice(MOTIVATIONAL_QUOTES)
-        msg = Message(
-            subject=f"📊 Work Summary - {username}",
-            recipients=[user_email]
-        )
-        
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #34c759; margin: 0;">📊 Work Summary</h1>
-                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
-                    </div>
-                    
-                    <div style="background: #e8f4fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div style="background: #34c759; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
-                                {username[0].upper()}
-                            </div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
-                                <div style="font-size: 0.9em; color: #86868b;">Daily attendance summary</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
-                            <div style="background: white; border-radius: 6px; padding: 12px;">
-                                <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Login Time</div>
-                                <div style="font-weight: bold; color: #1d1d1f;">{login_time_str}</div>
-                            </div>
-                            <div style="background: white; border-radius: 6px; padding: 12px;">
-                                <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Logout Time</div>
-                                <div style="font-weight: bold; color: #1d1d1f;">{logout_time_str}</div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: #d1f4e0; border-radius: 6px; padding: 15px; text-align: center; margin-top: 10px;">
-                            <div style="font-size: 0.8em; color: #0a7d3e; margin-bottom: 4px;">Total Hours Worked</div>
-                            <div style="font-size: 2em; font-weight: bold; color: #0a7d3e;">{hours:.1f} hours</div>
-                        </div>
-                    </div>
-                    
-                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
-                        <div style="font-style: italic; color: #6e6e73; margin-bottom: 20px;">"{quote}"</div>
-                        <div style="font-size: 0.8em; color: #86868b;">This is an automated email. Please do not reply.</div>
-                    </div>
-                </div>
-            </body>
-        </html>
-        """
-        
-        mail.send(msg)
-        print(f"Logout email sent to {user_email}")
-        return True
-    except Exception as e:
-        print(f"Failed to send logout email: {e}")
-        return False
-
-def send_leave_application_email_to_admin(username, user_email, leave_date, leave_type, comments):
-    """Send email to admin about new leave application"""
-    try:
-        msg = Message(
-            subject=f"📋 New Leave Application - {username}",
-            recipients=[ADMIN_EMAIL]
-        )
-        
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #ff9500; margin: 0;">📋 New Leave Application</h1>
-                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
-                    </div>
-                    
-                    <div style="background: #fff3cd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div style="background: #ff9500; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
-                                {username[0].upper()}
-                            </div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
-                                <div style="font-size: 0.9em; color: #86868b;">{user_email}</div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; border-radius: 6px; padding: 15px; margin-bottom: 10px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div>
-                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Date</div>
-                                    <div style="font-weight: bold; color: #1d1d1f;">{leave_date}</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Type</div>
-                                    <div style="font-weight: bold; color: #ff9500;">{leave_type}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {comments if comments else ''}
-                    </div>
-                    
-                    <div style="background: #e8f4fd; border-radius: 6px; padding: 15px; text-align: center;">
-                        <p style="margin: 0; color: #0071e3; font-weight: 600;">Action Required: Please review this leave application in the Admin Dashboard</p>
-                    </div>
-                    
-                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
-                        <div style="font-size: 0.8em; color: #86868b;">
-                            <p style="margin: 0;">JAIN University - Admin Panel</p>
-                            <p style="margin: 5px 0 0 0;">This is an automated notification. Please do not reply.</p>
-                        </div>
-                    </div>
-                </div>
-            </body>
-        </html>
-        """
-        
-        if comments:
-            msg.html = msg.html.replace("{comments if comments else ''}", f"""
-                <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
-                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Reason/Comments</div>
-                    <div style="font-weight: normal; color: #1d1d1f;">{comments}</div>
-                </div>
-            """)
-        
-        mail.send(msg)
-        print(f"Leave application email sent to admin")
-        return True
-    except Exception as e:
-        print(f"Failed to send leave application email: {e}")
-        return False
-
-def send_leave_status_email_to_user(user_email, username, leave_date, leave_type, status, admin_comments):
-    """Send email to user about leave status update"""
-    try:
-        status_color = "#34c759" if status == "approved" else "#ff3b30"
-        status_icon = "✅" if status == "approved" else "❌"
-        status_title = "Leave Approved" if status == "approved" else "Leave Denied"
-        
-        msg = Message(
-            subject=f"{status_icon} Leave {status.capitalize()} - {username}",
-            recipients=[user_email]
-        )
-        
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f5f5f7; padding: 20px;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: {status_color}; margin: 0;">{status_icon} {status_title}</h1>
-                        <p style="color: #86868b; margin-top: 8px;">JAIN University Intern Attendance System</p>
-                    </div>
-                    
-                    <div style="background: {'#d1f4e0' if status == 'approved' else '#ffe5e5'}; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div style="background: {status_color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2em;">
-                                {username[0].upper()}
-                            </div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 1.1em; color: #1d1d1f;">{username}</div>
-                                <div style="font-size: 0.9em; color: #86868b;">Leave status has been updated</div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; border-radius: 6px; padding: 15px; margin-bottom: 10px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <div>
-                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Date</div>
-                                    <div style="font-weight: bold; color: #1d1d1f;">{leave_date}</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Leave Type</div>
-                                    <div style="font-weight: bold; color: #ff9500;">{leave_type}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; border-radius: 6px; padding: 15px; margin-top: 10px;">
-                            <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Status</div>
-                            <div style="font-weight: bold; color: {status_color}; font-size: 1.2em;">
-                                {status_icon} {status.upper()}
-                            </div>
-                        </div>
-                        
-                        {admin_comments if admin_comments else ''}
-                    </div>
-                    
-                    <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; text-align: center;">
-                        <div style="font-size: 0.8em; color: #86868b;">
-                            <p style="margin: 0;">JAIN University - Intern Attendance System</p>
-                            <p style="margin: 5px 0 0 0;">This is an automated email. Please do not reply.</p>
-                        </div>
-                    </div>
-                </div>
-            </body>
-        </html>
-        """
-        
-        if admin_comments:
-            msg.html = msg.html.replace("{admin_comments if admin_comments else ''}", f"""
-                <div style="background: #f5f5f7; border-radius: 6px; padding: 15px; margin-top: 10px;">
-                    <div style="font-size: 0.8em; color: #86868b; margin-bottom: 4px;">Admin Comments</div>
-                    <div style="font-weight: normal; color: #1d1d1f;">{admin_comments}</div>
-                </div>
-            """)
-        
-        mail.send(msg)
-        print(f"Leave status email sent to {user_email}")
-        return True
-    except Exception as e:
-        print(f"Failed to send leave status email: {e}")
-        return False
+def calculate_shift_hours(target_hours):
+    return target_hours / 2
 
 # Routes: Authentication
 @app.route("/")
@@ -463,15 +207,19 @@ def register():
         password = request.form["password"]
         role = request.form.get("role", "intern")
         email = request.form.get("email", "")
+        work_hours = float(request.form.get("work_hours", DEFAULT_WORK_HOURS))
+        
         if mongo.db.users.find_one({"username": username}):
             flash("Username already exists", "danger")
             return redirect(url_for("register"))
+        
         hashed = bcrypt.generate_password_hash(password).decode("utf-8")
         mongo.db.users.insert_one({
             "username": username,
             "password": hashed,
             "role": role,
             "email": email,
+            "work_hours": work_hours,
             "created_at": datetime.utcnow()
         })
         flash("Registered! Please login.", "success")
@@ -527,53 +275,132 @@ def _get_lat_lng_from_request():
 @login_required
 def attendance_login():
     if current_user.role != "intern":
-        return jsonify({"error":"Only interns can record attendance"}), 403
+        return jsonify({"error": "Only interns can record attendance"}), 403
 
+    data = request.get_json() if request.is_json else {}
     lat, lng = _get_lat_lng_from_request()
+    
     if lat is None or lng is None:
-        return jsonify({"error":"Location required (allow browser geolocation)."}), 400
+        return jsonify({"error": "Location required"}), 400
 
     dist = haversine_km(lat, lng, OFFICE_LAT, OFFICE_LNG)
     if dist > ALLOWED_RADIUS_KM:
-        return jsonify({"error":"Not within office radius", "distance_km": round(dist,4)}), 403
+        address = get_address_from_coords(lat, lng)
+        return jsonify({
+            "error": "Not within office radius", 
+            "distance_km": round(dist, 4),
+            "current_location": {"lat": lat, "lng": lng, "address": address},
+            "office_location": {"lat": OFFICE_LAT, "lng": OFFICE_LNG, "address": "JAIN University Head Office"}
+        }), 403
 
     ist_now = get_ist_now()
     today = ist_now.date().isoformat()
     
-    rec = mongo.db.attendance.find_one({"user_id": ObjectId(current_user.id), "date": today, "logout_time": {"$exists": False}})
-    if rec:
-        return jsonify({"error":"Already logged in and not logged out yet."}), 400
-
+    login_type = data.get("login_type", "normal")
+    shift_type = data.get("shift_type", "normal")
+    shift_name = data.get("shift_name", "Normal Login")
+    
+    user = mongo.db.users.find_one({"_id": ObjectId(current_user.id)})
+    work_hours_target = user.get("work_hours", DEFAULT_WORK_HOURS)
+    shift_hours = calculate_shift_hours(work_hours_target)
+    
+    if login_type == "shift":
+        existing_shift = mongo.db.attendance.find_one({
+            "user_id": ObjectId(current_user.id),
+            "date": today,
+            "shift_type": shift_type,
+            "logout_time": {"$exists": False}
+        })
+        
+        if existing_shift:
+            return jsonify({"error": f"You already have an active {shift_name} session"}), 400
+        
+        session_count = mongo.db.attendance.count_documents({
+            "user_id": ObjectId(current_user.id),
+            "date": today
+        })
+        
+        session_number = session_count + 1
+    else:
+        existing = mongo.db.attendance.find_one({
+            "user_id": ObjectId(current_user.id),
+            "date": today,
+            "logout_time": {"$exists": False}
+        })
+        
+        if existing:
+            return jsonify({"error": "You're already logged in. Please logout first."}), 400
+        
+        session_number = 1
+    
     now_utc = datetime.utcnow()
-    mongo.db.attendance.insert_one({
+    address = get_address_from_coords(lat, lng)
+    
+    attendance_record = {
         "user_id": ObjectId(current_user.id),
         "username": current_user.username,
         "date": today,
         "login_time": now_utc,
-        "login_location": {"lat": lat, "lng": lng},
-        "created_at": now_utc
-    })
+        "login_location": {"lat": lat, "lng": lng, "address": address},
+        "login_address": address,
+        "created_at": now_utc,
+        "login_type": login_type,
+        "shift_type": shift_type,
+        "shift_name": shift_name,
+        "session_number": session_number,
+        "work_hours_target": work_hours_target,
+        "shift_target_hours": shift_hours
+    }
+    
+    result = mongo.db.attendance.insert_one(attendance_record)
     
     login_time_str = format_ist_time(now_utc, "%Y-%m-%d %I:%M:%S %p")
-    if current_user.email:
-        send_login_email(current_user.email, current_user.username, login_time_str)
     
-    return jsonify({"ok": True, "login_time": format_ist_time(now_utc)})
+    return jsonify({
+        "ok": True, 
+        "login_time": format_ist_time(now_utc),
+        "login_type": login_type,
+        "shift_name": shift_name,
+        "session_number": session_number,
+        "address": address,
+        "shift_target_hours": shift_hours
+    })
 
 @app.route("/attendance/logout", methods=["POST"])
 @login_required
 def attendance_logout():
     if current_user.role != "intern":
-        return jsonify({"error":"Only interns can record attendance"}), 403
+        return jsonify({"error": "Only interns can record attendance"}), 403
 
+    data = request.get_json() if request.is_json else {}
     lat, lng = _get_lat_lng_from_request()
+    force_logout = data.get("force_logout", False)
     
     ist_now = get_ist_now()
     today = ist_now.date().isoformat()
     
-    rec = mongo.db.attendance.find_one({"user_id": ObjectId(current_user.id), "date": today, "logout_time": {"$exists": False}})
+    shift_type = data.get("shift_type")
+    
+    query = {
+        "user_id": ObjectId(current_user.id),
+        "date": today,
+        "logout_time": {"$exists": False}
+    }
+    
+    if shift_type:
+        query["shift_type"] = shift_type
+    
+    rec = mongo.db.attendance.find_one(query)
+    
     if not rec:
-        return jsonify({"error":"No active login found for today"}), 400
+        rec = mongo.db.attendance.find_one({
+            "user_id": ObjectId(current_user.id),
+            "date": today,
+            "logout_time": {"$exists": False}
+        })
+        
+        if not rec:
+            return jsonify({"error": "No active login session found"}), 400
 
     logout_time = datetime.utcnow()
     login_time = rec.get("login_time")
@@ -587,20 +414,74 @@ def attendance_logout():
         except Exception:
             duration = None
 
-    updates = {"logout_time": logout_time, "hours": round(duration, 4) if duration is not None else None}
+    shift_target_hours = rec.get("shift_target_hours", MIN_WORK_HOURS)
+    
+    if not force_logout and duration is not None and duration < MIN_WORK_HOURS:
+        return jsonify({
+            "warning": True,
+            "message": f"You've only worked {duration:.1f} hours. Minimum recommended is {MIN_WORK_HOURS} hours. Are you sure?",
+            "hours_worked": round(duration, 1),
+            "min_hours": MIN_WORK_HOURS
+        }), 200
+
+    updates = {
+        "logout_time": logout_time, 
+        "hours": round(duration, 4) if duration is not None else None
+    }
+    
     if lat is not None and lng is not None:
-        updates["logout_location"] = {"lat": lat, "lng": lng}
+        address = get_address_from_coords(lat, lng)
+        updates["logout_location"] = {"lat": lat, "lng": lng, "address": address}
+        updates["logout_address"] = address
 
     mongo.db.attendance.update_one({"_id": rec["_id"]}, {"$set": updates})
     
-    if current_user.email and duration is not None:
-        login_time_str = format_ist_time(login_time, "%Y-%m-%d %I:%M:%S %p")
-        logout_time_str = format_ist_time(logout_time, "%Y-%m-%d %I:%M:%S %p")
-        send_logout_email(current_user.email, current_user.username, login_time_str, logout_time_str, duration)
+    # Calculate total hours for the day
+    total_daily_hours = 0
+    shift1_hours = 0
+    shift2_hours = 0
     
-    return jsonify({"ok": True, "logout_time": format_ist_time(logout_time), "hours": updates["hours"]})
+    all_sessions = list(mongo.db.attendance.find({
+        "user_id": ObjectId(current_user.id),
+        "date": today
+    }))
+    
+    for session in all_sessions:
+        hours = session.get("hours", 0) or 0
+        total_daily_hours += hours
+        
+        if session.get("shift_type") == "shift1":
+            shift1_hours += hours
+        elif session.get("shift_type") == "shift2":
+            shift2_hours += hours
+    
+    target_hours = rec.get("work_hours_target", DEFAULT_WORK_HOURS)
+    target_achieved = total_daily_hours >= target_hours
+    
+    shift_target = target_hours / 2
+    shift1_completed = shift1_hours >= shift_target
+    shift2_completed = shift2_hours >= shift_target
+    
+    return jsonify({
+        "ok": True, 
+        "logout_time": format_ist_time(logout_time), 
+        "hours": updates["hours"],
+        "total_daily_hours": round(total_daily_hours, 1),
+        "target_hours": target_hours,
+        "target_achieved": target_achieved,
+        "shift1_hours": round(shift1_hours, 1),
+        "shift2_hours": round(shift2_hours, 1),
+        "shift1_completed": shift1_completed,
+        "shift2_completed": shift2_completed,
+        "shift_target": round(shift_target, 1),
+        "session_type": rec.get("shift_name", "Normal Login"),
+        "session_number": rec.get("session_number", 1),
+        "shift_target_hours": round(shift_target_hours, 1),
+        "can_login_shift1": not shift1_completed,
+        "can_login_shift2": not shift2_completed,
+        "message": f"Shift 1: {shift1_hours:.1f}/{shift_target:.1f} hrs, Shift 2: {shift2_hours:.1f}/{shift_target:.1f} hrs"
+    })
 
-# API endpoint for dashboard data
 @app.route("/api/dashboard-data")
 @login_required
 def get_dashboard_data():
@@ -611,12 +492,52 @@ def get_dashboard_data():
         ist_now = get_ist_now()
         today = ist_now.date().isoformat()
         
-        today_record = mongo.db.attendance.find_one({
+        today_sessions = list(mongo.db.attendance.find({
             "user_id": ObjectId(current_user.id), 
             "date": today
-        })
+        }).sort("login_time", 1))
         
-        cutoff = (date.today() - timedelta(days=90)).isoformat()
+        today_data = []
+        total_hours_today = 0
+        shift1_hours = 0
+        shift2_hours = 0
+        active_session = None
+        
+        for session in today_sessions:
+            login_time = session.get("login_time")
+            logout_time = session.get("logout_time")
+            session_hours = session.get("hours", 0) or 0
+            total_hours_today += session_hours
+            
+            if session.get("shift_type") == "shift1":
+                shift1_hours += session_hours
+            elif session.get("shift_type") == "shift2":
+                shift2_hours += session_hours
+            
+            login_loc = session.get("login_location", {})
+            
+            session_info = {
+                "session_number": session.get("session_number", 1),
+                "login_type": session.get("login_type", "normal"),
+                "shift_type": session.get("shift_type", "normal"),
+                "shift_name": session.get("shift_name", "Normal Login"),
+                "login_time": format_ist_time(login_time),
+                "logout_time": format_ist_time(logout_time) if logout_time else None,
+                "hours": round(session_hours, 1),
+                "is_active": logout_time is None,
+                "login_address": login_loc.get("address", "Address not available")
+            }
+            
+            if logout_time is None:
+                active_session = session_info
+            
+            today_data.append(session_info)
+        
+        user = mongo.db.users.find_one({"_id": ObjectId(current_user.id)})
+        work_hours_target = user.get("work_hours", DEFAULT_WORK_HOURS)
+        shift_target = work_hours_target / 2
+        
+        cutoff = (date.today() - timedelta(days=365)).isoformat()
         all_records = list(mongo.db.attendance.find({
             "user_id": ObjectId(current_user.id),
             "date": {"$gte": cutoff}
@@ -624,82 +545,168 @@ def get_dashboard_data():
         
         total_hours = sum([r.get("hours", 0) or 0 for r in all_records])
         
-        today_data = None
-        if today_record:
-            login_time = today_record.get("login_time")
-            logout_time = today_record.get("logout_time")
-            
-            today_data = {
-                "login_time": format_ist_time(login_time),
-                "logout_time": format_ist_time(logout_time),
-                "hours": str(round(today_record.get("hours", 0) or 0, 1))
-            }
-        
         all_formatted = []
         for rec in all_records:
             login_time = rec.get("login_time")
             logout_time = rec.get("logout_time")
             
+            login_loc = rec.get("login_location", {})
+            logout_loc = rec.get("logout_location", {})
+            
             all_formatted.append({
                 "date": rec.get("date", "N/A"),
                 "login_time": format_ist_time(login_time) if login_time else "N/A",
                 "logout_time": format_ist_time(logout_time) if logout_time else "N/A",
-                "hours": str(round(rec.get("hours", 0) or 0, 1)) if rec.get("hours") else "N/A"
+                "hours": str(round(rec.get("hours", 0) or 0, 1)) if rec.get("hours") else "N/A",
+                "shift_type": rec.get("shift_type", "normal"),
+                "shift_name": rec.get("shift_name", "Normal Login"),
+                "session_number": rec.get("session_number", 1),
+                "login_address": login_loc.get("address", "N/A"),
+                "logout_address": logout_loc.get("address", "N/A"),
+                "login_lat": login_loc.get("lat"),
+                "login_lng": login_loc.get("lng"),
+                "logout_lat": logout_loc.get("lat"),
+                "logout_lng": logout_loc.get("lng")
             })
+        
+        # Get leave data
+        leaves = list(mongo.db.leave_applications.find({
+            "user_id": ObjectId(current_user.id),
+            "status": "approved"
+        }))
+        
+        leave_dates = [l["date"] for l in leaves]
         
         return jsonify({
             "username": current_user.username,
-            "today_record": today_data,
-            "total_hours": f"{total_hours:.1f}",
+            "today_sessions": today_data,
+            "active_session": active_session,
+            "total_hours_today": round(total_hours_today, 1),
+            "shift1_hours": round(shift1_hours, 1),
+            "shift2_hours": round(shift2_hours, 1),
+            "work_hours_target": work_hours_target,
+            "shift_target": round(shift_target, 1),
+            "shift1_completed": shift1_hours >= shift_target,
+            "shift2_completed": shift2_hours >= shift_target,
+            "can_login_shift1": not (shift1_hours >= shift_target),
+            "can_login_shift2": not (shift2_hours >= shift_target),
+            "total_hours_yeartodate": f"{total_hours:.1f}",
             "office_address": "JAIN University Head Office, Bengaluru",
             "office_lat": OFFICE_LAT,
             "office_lng": OFFICE_LNG,
             "allowed_radius_km": ALLOWED_RADIUS_KM,
             "allowed_radius_m": ALLOWED_RADIUS_KM * 1000,
-            "history": all_formatted
+            "history": all_formatted,
+            "leaves": leave_dates,
+            "shifts": SHIFT_TIMINGS,
+            "min_hours_warning": MIN_WORK_HOURS
         })
         
     except Exception as e:
         print(f"Error in dashboard data API: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Leave Management API - FIXED VERSION
-# Replace the /api/leave/apply route in your Flask app with this fixed version
+@app.route("/api/statistics", methods=["POST"])
+@login_required
+def get_statistics():
+    if current_user.role != "intern":
+        return jsonify({"error": "Only interns can access statistics"}), 403
+    
+    try:
+        data = request.get_json()
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+        
+        if not start_date or not end_date:
+            return jsonify({"error": "Start and end dates required"}), 400
+        
+        # Get all sessions in date range
+        sessions = list(mongo.db.attendance.find({
+            "user_id": ObjectId(current_user.id),
+            "date": {"$gte": start_date, "$lte": end_date}
+        }).sort("date", 1))
+        
+        # Calculate statistics
+        total_days = len(set(s.get("date") for s in sessions))
+        total_hours = sum(s.get("hours", 0) or 0 for s in sessions)
+        avg_hours_per_day = total_hours / total_days if total_days > 0 else 0
+        
+        # Shift breakdown
+        shift1_sessions = [s for s in sessions if s.get("shift_type") == "shift1"]
+        shift2_sessions = [s for s in sessions if s.get("shift_type") == "shift2"]
+        normal_sessions = [s for s in sessions if s.get("login_type") == "normal"]
+        
+        shift1_hours = sum(s.get("hours", 0) or 0 for s in shift1_sessions)
+        shift2_hours = sum(s.get("hours", 0) or 0 for s in shift2_sessions)
+        normal_hours = sum(s.get("hours", 0) or 0 for s in normal_sessions)
+        
+        # Early logouts (less than target)
+        early_logouts = []
+        for session in sessions:
+            if session.get("hours") and session.get("work_hours_target"):
+                target = session.get("work_hours_target")
+                if session.get("hours") < target:
+                    early_logouts.append({
+                        "date": session.get("date"),
+                        "hours": session.get("hours"),
+                        "target": target,
+                        "shortfall": target - session.get("hours")
+                    })
+        
+        # Leaves in date range
+        leaves = list(mongo.db.leave_applications.find({
+            "user_id": ObjectId(current_user.id),
+            "date": {"$gte": start_date, "$lte": end_date},
+            "status": "approved"
+        }))
+        
+        return jsonify({
+            "ok": True,
+            "period": {"start": start_date, "end": end_date},
+            "total_days": total_days,
+            "total_hours": round(total_hours, 1),
+            "avg_hours_per_day": round(avg_hours_per_day, 1),
+            "shift1_hours": round(shift1_hours, 1),
+            "shift2_hours": round(shift2_hours, 1),
+            "normal_hours": round(normal_hours, 1),
+            "shift1_sessions": len(shift1_sessions),
+            "shift2_sessions": len(shift2_sessions),
+            "normal_sessions": len(normal_sessions),
+            "early_logouts": len(early_logouts),
+            "early_logout_details": early_logouts,
+            "leaves_taken": len(leaves),
+            "leave_details": [{"date": l["date"], "type": l["type"]} for l in leaves]
+        })
+        
+    except Exception as e:
+        print(f"Error in statistics API: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/leave/apply", methods=["POST"])
 @login_required
 def apply_leave():
-    """Fixed leave application endpoint"""
     if current_user.role != "intern":
         return jsonify({"error": "Only interns can apply for leave"}), 403
     
     try:
-        # Check if request is JSON
         if not request.is_json:
             return jsonify({"error": "Content-Type must be application/json"}), 415
         
         data = request.get_json()
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
-        
         leave_date = data.get("date")
         leave_type = data.get("type")
         comments = data.get("comments", "")
         
-        # Validate required fields
         if not leave_date or not leave_type:
             return jsonify({"error": "Date and type are required"}), 400
         
-        # Validate date format
         try:
             parsed_date = datetime.strptime(leave_date, "%Y-%m-%d")
-            # Check if date is in the past (except today)
             if parsed_date.date() < date.today():
                 return jsonify({"error": "Cannot apply for leave in the past"}), 400
         except ValueError:
-            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+            return jsonify({"error": "Invalid date format"}), 400
         
-        # Check for existing leave application
         existing = mongo.db.leave_applications.find_one({
             "user_id": ObjectId(current_user.id),
             "date": leave_date
@@ -712,20 +719,16 @@ def apply_leave():
             elif status == "approved":
                 return jsonify({"error": "You already have an approved leave for this date"}), 400
             elif status == "denied":
-                # Allow reapplication if previously denied
                 mongo.db.leave_applications.delete_one({"_id": existing["_id"]})
         
-        # Check if it's a holiday
         if leave_date in UNIVERSITY_HOLIDAYS_2026:
             holiday = UNIVERSITY_HOLIDAYS_2026[leave_date]
             return jsonify({"error": f"This is already a holiday: {holiday['name']}"}), 400
         
-        # Check if it's a weekend (Saturday/Sunday)
         date_obj = datetime.strptime(leave_date, "%Y-%m-%d")
-        if date_obj.weekday() in [5, 6]:  # 5=Saturday, 6=Sunday
+        if date_obj.weekday() in [5, 6]:
             return jsonify({"error": "Cannot apply for leave on weekends"}), 400
         
-        # Create leave application
         leave_doc = {
             "user_id": ObjectId(current_user.id),
             "username": current_user.username,
@@ -741,65 +744,16 @@ def apply_leave():
         
         result = mongo.db.leave_applications.insert_one(leave_doc)
         
-        # Send email to admin (non-blocking)
-        try:
-            if current_user.email:
-                send_leave_application_email_to_admin(
-                    current_user.username,
-                    current_user.email,
-                    leave_date,
-                    leave_type,
-                    comments
-                )
-        except Exception as email_error:
-            print(f"Failed to send email notification: {email_error}")
-            # Don't fail the request if email fails
-        
         return jsonify({
             "ok": True, 
-            "message": "Leave application submitted successfully. Admin will review your request.",
+            "message": "Leave application submitted successfully",
             "leave_id": str(result.inserted_id)
         }), 200
         
     except Exception as e:
         print(f"Error in apply_leave: {e}")
-        import traceback
-        traceback.print_exc()
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-
-# Also add this helper route to check leave status
-@app.route("/api/leave/check/<leave_date>", methods=["GET"])
-@login_required
-def check_leave(leave_date):
-    """Check if leave already exists for a date"""
-    try:
-        existing = mongo.db.leave_applications.find_one({
-            "user_id": ObjectId(current_user.id),
-            "date": leave_date
-        })
-        
-        if existing:
-            return jsonify({
-                "exists": True,
-                "status": existing.get("status"),
-                "type": existing.get("type"),
-                "comments": existing.get("comments", "")
-            })
-        
-        # Check if it's a holiday
-        if leave_date in UNIVERSITY_HOLIDAYS_2026:
-            holiday = UNIVERSITY_HOLIDAYS_2026[leave_date]
-            return jsonify({
-                "is_holiday": True,
-                "holiday_name": holiday["name"],
-                "holiday_type": holiday["type"]
-            })
-        
-        return jsonify({"exists": False})
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 @app.route("/api/leaves", methods=["GET"])
 @login_required
 def get_all_leaves():
@@ -807,7 +761,7 @@ def get_all_leaves():
         return jsonify({"error": "Only interns can access leave data"}), 403
     
     try:
-        cutoff = (date.today() - timedelta(days=90)).isoformat()
+        cutoff = (date.today() - timedelta(days=365)).isoformat()
         leaves = list(mongo.db.leave_applications.find({
             "user_id": ObjectId(current_user.id),
             "date": {"$gte": cutoff}
@@ -942,21 +896,164 @@ def update_leave_status(leave_id):
             }
         )
         
-        user_email = leave_app.get("user_email")
-        if user_email:
-            send_leave_status_email_to_user(
-                user_email,
-                leave_app.get("username"),
-                leave_app.get("date"),
-                leave_app.get("type"),
-                status,
-                admin_comments
-            )
-        
-        return jsonify({"ok": True, "message": f"Leave {status} successfully. User will be notified via email."})
+        return jsonify({"ok": True, "message": f"Leave {status} successfully."})
         
     except Exception as e:
         print(f"Error updating leave status: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/admin/early-logouts")
+@login_required
+def get_early_logouts():
+    if not current_user.is_authenticated or current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        today = date.today().isoformat()
+        
+        sessions = list(mongo.db.attendance.find({
+            "date": today,
+            "logout_time": {"$exists": True}
+        }))
+        
+        early_logouts = []
+        for session in sessions:
+            target_hours = session.get("work_hours_target", DEFAULT_WORK_HOURS)
+            hours_worked = session.get("hours", 0) or 0
+            
+            if hours_worked < target_hours:
+                login_time = session.get("login_time")
+                logout_time = session.get("logout_time")
+                login_loc = session.get("login_location", {})
+                logout_loc = session.get("logout_location", {})
+                
+                early_logouts.append({
+                    "username": session.get("username"),
+                    "date": session.get("date"),
+                    "login_time": format_ist_time(login_time),
+                    "logout_time": format_ist_time(logout_time),
+                    "hours_worked": round(hours_worked, 1),
+                    "target_hours": target_hours,
+                    "shortfall": round(target_hours - hours_worked, 1),
+                    "shift_type": session.get("shift_type", "normal"),
+                    "shift_name": session.get("shift_name", "Normal Login"),
+                    "session_number": session.get("session_number", 1),
+                    "login_address": login_loc.get("address", "Address not available"),
+                    "logout_address": logout_loc.get("address", "Address not available")
+                })
+        
+        return jsonify({
+            "early_logouts": early_logouts,
+            "count": len(early_logouts),
+            "date": today
+        })
+        
+    except Exception as e:
+        print(f"Error fetching early logouts: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/admin/shift-usage")
+@login_required
+def get_shift_usage():
+    if not current_user.is_authenticated or current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        start_date = request.args.get("start_date", (date.today() - timedelta(days=30)).isoformat())
+        end_date = request.args.get("end_date", date.today().isoformat())
+        
+        sessions = list(mongo.db.attendance.find({
+            "date": {"$gte": start_date, "$lte": end_date},
+            "login_type": "shift"
+        }))
+        
+        shift_stats = {}
+        user_shift_stats = {}
+        
+        for session in sessions:
+            shift_type = session.get("shift_type", "unknown")
+            shift_name = session.get("shift_name", "Unknown Shift")
+            username = session.get("username")
+            
+            if shift_type not in shift_stats:
+                shift_stats[shift_type] = {
+                    "name": shift_name,
+                    "count": 0,
+                    "total_hours": 0,
+                    "users": set()
+                }
+            
+            shift_stats[shift_type]["count"] += 1
+            shift_stats[shift_type]["total_hours"] += session.get("hours", 0) or 0
+            shift_stats[shift_type]["users"].add(username)
+            
+            if username not in user_shift_stats:
+                user_shift_stats[username] = {}
+            
+            if shift_type not in user_shift_stats[username]:
+                user_shift_stats[username][shift_type] = {
+                    "name": shift_name,
+                    "count": 0,
+                    "total_hours": 0
+                }
+            
+            user_shift_stats[username][shift_type]["count"] += 1
+            user_shift_stats[username][shift_type]["total_hours"] += session.get("hours", 0) or 0
+        
+        for shift in shift_stats.values():
+            shift["unique_users"] = len(shift["users"])
+            del shift["users"]
+        
+        return jsonify({
+            "shift_stats": shift_stats,
+            "user_shift_stats": user_shift_stats,
+            "period": {"start": start_date, "end": end_date},
+            "total_shift_sessions": len(sessions)
+        })
+        
+    except Exception as e:
+        print(f"Error fetching shift usage: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/admin/user-locations/<date>")
+@login_required
+def get_user_locations(date):
+    if not current_user.is_authenticated or current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        sessions = list(mongo.db.attendance.find({"date": date}))
+        
+        locations = []
+        for session in sessions:
+            login_loc = session.get("login_location", {})
+            logout_loc = session.get("logout_location", {})
+            
+            locations.append({
+                "username": session.get("username"),
+                "date": session.get("date"),
+                "shift_type": session.get("shift_type", "normal"),
+                "shift_name": session.get("shift_name", "Normal Login"),
+                "session_number": session.get("session_number", 1),
+                "login_time": format_ist_time(session.get("login_time")),
+                "logout_time": format_ist_time(session.get("logout_time")) if session.get("logout_time") else None,
+                "login_lat": login_loc.get("lat"),
+                "login_lng": login_loc.get("lng"),
+                "login_address": login_loc.get("address", "Address not available"),
+                "logout_lat": logout_loc.get("lat"),
+                "logout_lng": logout_loc.get("lng"),
+                "logout_address": logout_loc.get("address", "Address not available") if logout_loc else None,
+                "hours": session.get("hours", 0) or 0
+            })
+        
+        return jsonify({
+            "locations": locations,
+            "date": date,
+            "count": len(locations)
+        })
+        
+    except Exception as e:
+        print(f"Error fetching user locations: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/holidays")
@@ -1063,83 +1160,64 @@ def get_user_stats(user_id):
             "user_id": ObjectId(user_id)
         })
         
+        shift_sessions = list(mongo.db.attendance.find({
+            "user_id": ObjectId(user_id),
+            "login_type": "shift"
+        }))
+        
+        shift_breakdown = {}
+        for session in shift_sessions:
+            shift_type = session.get("shift_type", "unknown")
+            if shift_type not in shift_breakdown:
+                shift_breakdown[shift_type] = {
+                    "count": 0,
+                    "total_hours": 0,
+                    "name": session.get("shift_name", "Unknown")
+                }
+            shift_breakdown[shift_type]["count"] += 1
+            shift_breakdown[shift_type]["total_hours"] += session.get("hours", 0) or 0
+        
         return jsonify({
             "username": user["username"],
             "email": user.get("email", "N/A"),
             "attendance_this_month": attendance_count,
             "leaves_this_month": leaves_count,
-            "total_working_days": total_working_days
+            "total_working_days": total_working_days,
+            "work_hours_target": user.get("work_hours", DEFAULT_WORK_HOURS),
+            "shift_usage": shift_breakdown,
+            "total_shift_sessions": len(shift_sessions)
         })
         
     except Exception as e:
         print(f"Error fetching user stats: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/admin/calendar-data")
+@app.route("/api/admin/update-user-work-hours", methods=["POST"])
 @login_required
-def get_admin_calendar_data():
+def update_user_work_hours():
     if not current_user.is_authenticated or current_user.role != "admin":
         return jsonify({"error": "Admin access required"}), 403
     
     try:
-        user_ids = request.args.getlist('users')
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
+        data = request.get_json()
+        user_id = data.get("user_id")
+        work_hours = float(data.get("work_hours", DEFAULT_WORK_HOURS))
         
-        if not start_date:
-            start_date = (date.today() - timedelta(days=90)).isoformat()
-        if not end_date:
-            end_date = date.today().isoformat()
+        if work_hours < 1 or work_hours > 12:
+            return jsonify({"error": "Work hours must be between 1 and 12"}), 400
         
-        query = {"date": {"$gte": start_date, "$lte": end_date}}
+        result = mongo.db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"work_hours": work_hours}}
+        )
         
-        if user_ids and 'all' not in user_ids:
-            query["user_id"] = {"$in": [ObjectId(uid) for uid in user_ids if uid]}
-        
-        attendance = list(mongo.db.attendance.find(query))
-        leaves = list(mongo.db.leave_applications.find({**query, "status": "approved"}))
-        
-        calendar_data = {}
-        
-        for rec in attendance:
-            username = rec.get("username")
-            date_str = rec.get("date")
+        if result.modified_count > 0:
+            return jsonify({"ok": True, "message": f"Work hours updated to {work_hours} hours"})
+        else:
+            return jsonify({"error": "User not found or no changes made"}), 404
             
-            if username not in calendar_data:
-                calendar_data[username] = {}
-            
-            login_time = rec.get("login_time")
-            logout_time = rec.get("logout_time")
-            
-            calendar_data[username][date_str] = {
-                "type": "present",
-                "login_time": format_ist_time(login_time) if login_time else "N/A",
-                "logout_time": format_ist_time(logout_time) if logout_time else "N/A",
-                "hours": round(rec.get("hours", 0) or 0, 1)
-            }
-        
-        for leave in leaves:
-            username = leave.get("username")
-            date_str = leave.get("date")
-            
-            if username not in calendar_data:
-                calendar_data[username] = {}
-            
-            calendar_data[username][date_str] = {
-                "type": "leave",
-                "leave_type": leave.get("type"),
-                "comments": leave.get("comments", ""),
-                "status": leave.get("status")
-            }
-        
-        return jsonify({
-            "calendar_data": calendar_data,
-            "start_date": start_date,
-            "end_date": end_date
-        })
-        
     except Exception as e:
-        print(f"Error in admin calendar API: {e}")
+        print(f"Error updating work hours: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/user/dashboard")
@@ -1148,53 +1226,6 @@ def user_dashboard():
     if current_user.role != "intern":
         return redirect(url_for("admin_dashboard"))
     return render_template("user_dashboard.html")
-
-@app.route("/history")
-@login_required
-def attendance_history():
-    if current_user.role != "intern":
-        return redirect(url_for("admin_dashboard"))
-    raw_history = list(mongo.db.attendance.find({"user_id": ObjectId(current_user.id)}).sort("date", -1))
-    history = [serialize_attendance(r) for r in raw_history]
-    return render_template("attendance_history.html", history=history)
-
-@app.route("/admin/notifications", methods=["GET","POST"])
-@login_required
-def admin_notifications():
-    if not current_user.is_authenticated or current_user.role != "admin":
-        return redirect(url_for("user_dashboard"))
-    
-    if request.method == "POST":
-        to_user = request.form.get("to_user")
-        message = request.form.get("message")
-        mongo.db.notifications.insert_one({
-            "sender": current_user.username,
-            "to_user": to_user,
-            "message": message,
-            "timestamp": datetime.utcnow(),
-            "replies": []
-        })
-        flash("Notification sent", "success")
-        return redirect(url_for("admin_notifications"))
-    
-    notifications = list(mongo.db.notifications.find().sort("timestamp", -1))
-    users = list(mongo.db.users.find())
-    return render_template("notifications.html", notifications=notifications, users=users)
-
-@app.route("/notifications")
-@login_required
-def view_notifications():
-    notifs = list(mongo.db.notifications.find({"$or":[{"to_user":"all"}, {"to_user": current_user.id}, {"to_user": current_user.username}] }).sort("timestamp", -1))
-    return render_template("notifications.html", notifications=notifs, users=[])
-
-@app.route("/notifications/<nid>/reply", methods=["POST"])
-@login_required
-def reply_notification(nid):
-    text = request.form.get("reply_text")
-    reply = {"user_id": current_user.id, "username": current_user.username, "text": text, "timestamp": datetime.utcnow()}
-    mongo.db.notifications.update_one({"_id": ObjectId(nid)}, {"$push": {"replies": reply}})
-    flash("Reply sent", "success")
-    return redirect(url_for("view_notifications") if current_user.role=="intern" else url_for("admin_notifications"))
 
 @app.route("/admin/dashboard")
 @login_required
@@ -1209,7 +1240,6 @@ def admin_dashboard():
         users.append(user)
     
     recent = list(mongo.db.attendance.find().sort("date", -1).limit(100))
-    recent_serialized = [serialize_attendance(r) for r in recent]
     
     cutoff = (date.today() - timedelta(days=90)).isoformat()
     leaves = list(mongo.db.leave_applications.find({"date": {"$gte": cutoff}}).sort("applied_at", -1))
@@ -1231,8 +1261,10 @@ def admin_dashboard():
     
     return render_template("admin_dashboard.html", 
                          users=users, 
-                         recent=recent_serialized,
-                         leaves=leaves_data)
+                         recent=recent,
+                         leaves=leaves_data,
+                         shifts=SHIFT_TIMINGS,
+                         today_date=date.today().isoformat())
 
 @app.route("/admin/export", methods=["GET"])
 @login_required
@@ -1252,12 +1284,25 @@ def admin_export():
     for r in recs:
         lt = r.get("login_time")
         lot = r.get("logout_time")
+        login_loc = r.get("login_location", {})
+        logout_loc = r.get("logout_location", {})
+        
         rows.append({
             "username": r.get("username"),
             "date": r.get("date"),
+            "login_type": r.get("login_type", "normal"),
+            "shift_type": r.get("shift_type", "normal"),
+            "shift_name": r.get("shift_name", "Normal Login"),
+            "session_number": r.get("session_number", 1),
             "login_time": format_ist_time(lt, "%Y-%m-%d %I:%M:%S %p") if lt else "",
             "logout_time": format_ist_time(lot, "%Y-%m-%d %I:%M:%S %p") if lot else "",
-            "hours": r.get("hours", 0) or 0
+            "hours": r.get("hours", 0) or 0,
+            "login_lat": login_loc.get("lat"),
+            "login_lng": login_loc.get("lng"),
+            "login_address": login_loc.get("address", ""),
+            "logout_lat": logout_loc.get("lat"),
+            "logout_lng": logout_loc.get("lng"),
+            "logout_address": logout_loc.get("address", "")
         })
     
     df = pd.DataFrame(rows)
@@ -1269,7 +1314,6 @@ def admin_export():
     filename = f"attendance_{start}_to_{end}.csv"
     return send_file(mem, as_attachment=True, download_name=filename, mimetype="text/csv")
 
-# Admin: create user
 @app.route("/admin/create_user", methods=["POST"])
 @login_required
 def admin_create_user():
@@ -1280,6 +1324,7 @@ def admin_create_user():
     password = request.form.get("password")
     role = request.form.get("role", "intern")
     email = request.form.get("email", "")
+    work_hours = float(request.form.get("work_hours", DEFAULT_WORK_HOURS))
     
     if mongo.db.users.find_one({"username": username}):
         flash("User exists", "danger")
@@ -1290,14 +1335,14 @@ def admin_create_user():
         "username": username, 
         "password": hashed, 
         "role": role, 
-        "email": email, 
+        "email": email,
+        "work_hours": work_hours,
         "created_at": datetime.utcnow()
     })
     
     flash("User created", "success")
     return redirect(url_for("admin_dashboard"))
 
-# Delete user
 @app.route("/admin/delete_user/<user_id>", methods=["POST"])
 @login_required
 def admin_delete_user(user_id):
@@ -1322,10 +1367,9 @@ def admin_delete_user(user_id):
         print(f"Error deleting user: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Health endpoint
 @app.route("/health")
 def health():
-    return {"status":"ok"}
+    return {"status": "ok"}
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)

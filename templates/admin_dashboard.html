@@ -105,6 +105,34 @@
             color: white;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #0071e3;
+            line-height: 1.2;
+        }
+
+        .stat-card .label {
+            font-size: 0.8em;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -124,7 +152,8 @@
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             background: #f5f5f7;
             border: 1px solid #d2d2d7;
@@ -136,7 +165,8 @@
         }
 
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #0071e3;
             background: white;
@@ -173,15 +203,27 @@
             box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
         }
 
+        .btn-warning {
+            background: #ff9500;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #ff8800;
+        }
+
         .btn-danger {
             background: #ff3b30;
             color: white;
-            padding: 8px 16px;
-            font-size: 0.85rem;
         }
 
         .btn-danger:hover {
             background: #ff2d55;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
         }
 
         table {
@@ -214,123 +256,9 @@
             background: #fafafa;
         }
 
-        /* Calendar Styles */
-        .calendar-controls {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .calendar-controls select {
-            background: #f5f5f7;
-            border: 1px solid #d2d2d7;
-            padding: 10px 14px;
-            border-radius: 10px;
-            color: #1d1d1f;
-            font-size: 0.9rem;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .calendar-month {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1d1d1f;
-        }
-
-        .calendar-nav button {
-            background: #f5f5f7;
-            border: none;
-            color: #1d1d1f;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 0 4px;
-            transition: all 0.2s;
-        }
-
-        .calendar-nav button:hover {
-            background: #0071e3;
-            color: white;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .calendar-day-header {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #6e6e73;
-            text-transform: uppercase;
-            padding: 12px 0;
-            font-weight: 600;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            background: #f5f5f7;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            padding: 8px;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-            min-height: 80px;
-        }
-
-        .calendar-day:hover {
-            background: #e8e8ed;
-            transform: translateY(-2px);
-        }
-
-        .calendar-day.other-month {
-            color: #c7c7cc;
-        }
-
-        .calendar-day.today {
-            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
-            color: white;
-        }
-
-        .calendar-day-number {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .status-dots {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2px;
-            margin-top: 4px;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        /* User Cards */
         .user-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
@@ -362,39 +290,6 @@
             font-weight: 600;
         }
 
-        .user-card p {
-            color: #6e6e73;
-            font-size: 0.9rem;
-            margin: 4px 0;
-        }
-
-        .user-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 12px;
-            background: white;
-            border-radius: 10px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0071e3;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: #6e6e73;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
         .role-badge {
             padding: 6px 12px;
             border-radius: 8px;
@@ -413,7 +308,92 @@
             color: white;
         }
 
-        /* User Detail Modal */
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0071e3;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: #6e6e73;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .early-logout-item {
+            background: #fff3cd;
+            border-left: 4px solid #ff9500;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .shift-stat-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .shift-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .shift-stat-name {
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        .shift-stat-count {
+            background: #0071e3;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .location-item {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0071e3;
+        }
+
+        .location-coords {
+            font-family: monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        .place-name {
+            font-weight: 600;
+            color: #0071e3;
+            margin-bottom: 4px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -436,7 +416,7 @@
             background: white;
             border-radius: 20px;
             padding: 32px;
-            max-width: 900px;
+            max-width: 600px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
@@ -473,333 +453,14 @@
             color: white;
         }
 
-        .user-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: #f5f5f7;
-            border-radius: 12px;
-        }
-
-        .user-badge-legend {
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: 2px solid;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .user-badge-legend:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Holiday Styles */
-        .holiday-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-box {
-            padding: 20px;
-            border-radius: 14px;
-            color: white;
-            text-align: center;
-        }
-
-        .holiday-item-admin {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 20px 24px;
-            border-left: 5px solid;
-            transition: all 0.3s;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 12px;
-        }
-
-        .holiday-item-admin:hover {
-            transform: translateX(6px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .holiday-item-admin.general {
-            border-color: #0071e3;
-        }
-
-        .holiday-item-admin.restricted {
-            border-color: #ff9500;
-        }
-
-        .holiday-item-admin.special {
-            border-color: #34c759;
-        }
-
-        .holiday-item-admin.saturday {
-            border-color: #af52de;
-        }
-
-        .holiday-date-box {
-            text-align: center;
-            padding: 16px;
-            background: #f5f5f7;
-            border-radius: 12px;
-            min-width: 100px;
-        }
-
-        .holiday-date-day {
-            font-size: 2em;
-            font-weight: 800;
-            color: #1d1d1f;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .holiday-date-month {
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #86868b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .holiday-date-weekday {
-            font-size: 0.75em;
-            color: #86868b;
-            margin-top: 4px;
-        }
-
-        .holiday-info {
-            flex: 1;
-        }
-
-        .holiday-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 8px;
-        }
-
-        .holiday-meta {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .holiday-type-badge {
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.75em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .holiday-type-badge.general {
-            background: #e8f4fd;
-            color: #0071e3;
-        }
-
-        .holiday-type-badge.restricted {
-            background: #fff3cd;
-            color: #ff9500;
-        }
-
-        .holiday-type-badge.special {
-            background: #d1f4e0;
-            color: #34c759;
-        }
-
-        .holiday-type-badge.saturday {
-            background: #f3e5f5;
-            color: #af52de;
-        }
-
-        .holiday-icon {
-            font-size: 2em;
-            color: #86868b;
-        }
-
-        /* Leave Management Styles */
-        .leave-application-card {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 16px;
-            border-left: 5px solid;
-            transition: all 0.3s;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .leave-application-card:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            transform: translateX(4px);
-        }
-
-        .leave-application-card.pending {
-            border-color: #ff9500;
-        }
-
-        .leave-application-card.approved {
-            border-color: #34c759;
-        }
-
-        .leave-application-card.denied {
-            border-color: #ff3b30;
-        }
-
-        .leave-date-box {
-            text-align: center;
-            padding: 16px;
-            background: #f5f5f7;
-            border-radius: 12px;
-            min-width: 100px;
-        }
-
-        .leave-date-day {
-            font-size: 2em;
-            font-weight: 800;
-            color: #1d1d1f;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .leave-date-month {
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #86868b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .leave-info {
-            flex: 1;
-        }
-
-        .leave-username {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #1d1d1f;
-            margin-bottom: 8px;
-        }
-
-        .leave-meta {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .leave-meta-item {
-            font-size: 0.85em;
-            color: #86868b;
-        }
-
-        .leave-meta-item strong {
-            color: #1d1d1f;
-        }
-
-        .leave-type-badge {
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.75em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: #e8f4fd;
-            color: #0071e3;
-        }
-
-        .leave-status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .leave-status-badge.pending {
-            background: #fff3cd;
-            color: #ff9500;
-        }
-
-        .leave-status-badge.approved {
-            background: #d1f4e0;
-            color: #34c759;
-        }
-
-        .leave-status-badge.denied {
-            background: #ffe5e5;
-            color: #ff3b30;
-        }
-
-        .leave-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .btn-review {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #0071e3;
-            color: white;
-        }
-
-        .btn-review:hover {
-            background: #0077ed;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
-        }
-
         @media (max-width: 968px) {
-            .form-grid {
+            .form-grid,
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
 
-            .user-stats {
+            .user-cards {
                 grid-template-columns: 1fr;
-            }
-
-            .calendar-grid {
-                grid-template-columns: repeat(7, 1fr);
-                gap: 4px;
-            }
-
-            .calendar-day {
-                min-height: 60px;
-                font-size: 0.7rem;
-            }
-
-            .holiday-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .holiday-item-admin {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
-            .leave-application-card {
-                grid-template-columns: 1fr;
-                gap: 16px;
             }
         }
     </style>
@@ -810,9 +471,10 @@
             <h1>Admin Dashboard</h1>
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('users')">Users</button>
-                <button class="tab" onclick="switchTab('calendar')">Calendar View</button>
-                <button class="tab" onclick="switchTab('leave-management')">Leave Management</button>
-                <button class="tab" onclick="switchTab('holidays')">Holidays</button>
+                <button class="tab" onclick="switchTab('early-logouts')">Early Logouts</button>
+                <button class="tab" onclick="switchTab('shift-usage')">Shift Usage</button>
+                <button class="tab" onclick="switchTab('locations')">Locations</button>
+                <button class="tab" onclick="switchTab('leaves')">Leave Management</button>
                 <button class="tab" onclick="switchTab('export')">Export</button>
             </div>
         </div>
@@ -844,6 +506,19 @@
                             <option value="admin">Admin</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Daily Work Hours Target:</label>
+                        <input type="number" name="work_hours" step="0.5" min="1" max="12" value="8" required>
+                        <small style="color: #86868b;">Will be split equally between Shift 1 and Shift 2</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Shift:</label>
+                        <select name="preferred_shift">
+                            <option value="shift1">Shift 1</option>
+                            <option value="shift2">Shift 2</option>
+                            <option value="normal">Normal Login</option>
+                        </select>
+                    </div>
                     <div style="grid-column: 1 / -1;">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus-circle"></i> Create User
@@ -865,32 +540,31 @@
                             <span class="role-badge role-{{ user.role }}">{{ user.role }}</span>
                         </div>
                         <p><i class="fas fa-envelope"></i> {{ user.email or 'No email' }}</p>
-                        <p><i class="fas fa-calendar"></i> Joined {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'N/A' }}</p>
+                        <p><i class="fas fa-clock"></i> Target: {{ user.work_hours or 8 }} hrs/day ({{ (user.work_hours or 8)/2 }} hrs per shift)</p>
+                        <p><i class="fas fa-calendar-alt"></i> Preferred: {{ user.preferred_shift or 'Not set' }}</p>
                         
                         {% if user.role == 'intern' %}
                         <div class="user-stats" id="stats-{{ user._id }}">
-                            <div class="stat-item">
-                                <div class="stat-value">-</div>
-                                <div class="stat-label">Working Days</div>
-                            </div>
                             <div class="stat-item">
                                 <div class="stat-value">-</div>
                                 <div class="stat-label">This Month</div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-value">-</div>
-                                <div class="stat-label">Leaves</div>
+                                <div class="stat-label">Shift 1</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">-</div>
+                                <div class="stat-label">Shift 2</div>
                             </div>
                         </div>
                         {% endif %}
                         
                         <div style="margin-top: 16px; display: flex; gap: 8px;">
-                            {% if user.role == 'intern' %}
-                            <button class="btn btn-primary" onclick="viewUserCalendar('{{ user._id }}', '{{ user.username }}')" style="flex: 1;">
-                                <i class="fas fa-calendar-alt"></i> View Calendar
+                            <button class="btn btn-primary btn-sm" onclick="viewUserDetails('{{ user._id }}')" style="flex: 1;">
+                                <i class="fas fa-eye"></i> Details
                             </button>
-                            {% endif %}
-                            <button class="btn btn-danger" onclick="deleteUser('{{ user._id }}', '{{ user.username }}')">
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('{{ user._id }}', '{{ user.username }}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -900,127 +574,81 @@
             </div>
         </div>
 
-        <!-- Calendar Tab -->
-        <div id="calendar" class="tab-content">
+        <!-- Early Logouts Tab -->
+        <div id="early-logouts" class="tab-content">
             <div class="card">
                 <h2>
-                    <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                    Attendance Calendar
+                    <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    Early Logouts Today
                 </h2>
-                
-                <div class="calendar-controls">
-                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-                        <label>Select Users:</label>
-                        <select id="userFilter" multiple style="height: 100px;">
-                            <option value="all" selected>All Users</option>
-                            {% for user in users %}
-                            {% if user.role == 'intern' %}
-                            <option value="{{ user._id }}">{{ user.username }}</option>
-                            {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: flex-end;">
-                        <button class="btn btn-primary" onclick="loadCalendarData()">
-                            <i class="fas fa-sync"></i> Load Calendar
-                        </button>
-                        <button class="btn btn-success" onclick="selectAllUsers()">
-                            <i class="fas fa-check-double"></i> Select All
-                        </button>
-                    </div>
+                <div id="earlyLogoutsList">
+                    <div style="text-align: center; padding: 40px; color: #86868b;">Loading...</div>
                 </div>
-
-                <div class="user-legend" id="userLegend"></div>
-
-                <div class="calendar-header">
-                    <div class="calendar-month" id="calendarMonth">Loading...</div>
-                    <div class="calendar-nav">
-                        <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-                        <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="calendar-grid" id="calendarGrid"></div>
             </div>
         </div>
 
-        <!-- Leave Management Tab -->
-        <div id="leave-management" class="tab-content">
+        <!-- Shift Usage Tab -->
+        <div id="shift-usage" class="tab-content">
+            <div class="card">
+                <h2>
+                    <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+                    Shift Usage Statistics
+                </h2>
+                
+                <div style="margin-bottom: 24px;">
+                    <label>Date Range:</label>
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <input type="date" id="shiftStartDate" class="form-group" style="flex: 1;">
+                        <input type="date" id="shiftEndDate" class="form-group" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="loadShiftUsage()">Load</button>
+                    </div>
+                </div>
+
+                <div id="shiftStats">
+                    <div style="text-align: center; padding: 40px; color: #86868b;">Select date range and load data</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Locations Tab -->
+        <div id="locations" class="tab-content">
+            <div class="card">
+                <h2>
+                    <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    Login/Logout Locations
+                </h2>
+                
+                <div style="margin-bottom: 24px;">
+                    <label>Select Date:</label>
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <input type="date" id="locationDate" class="form-group" style="flex: 1;" value="{{ today_date }}">
+                        <button class="btn btn-primary" onclick="loadLocations()">Load</button>
+                    </div>
+                </div>
+
+                <div id="locationsList">
+                    <div style="text-align: center; padding: 40px; color: #86868b;">Select date to view locations</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaves Tab -->
+        <div id="leaves" class="tab-content">
             <div class="card">
                 <h2>
                     <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                    Leave Applications Management
+                    Leave Applications
                 </h2>
                 
                 <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-                    <button class="btn" style="flex: 1; background: #0071e3; color: white;" onclick="filterLeaves('all')">
-                        <i class="fas fa-list"></i> All Applications
-                    </button>
-                    <button class="btn" style="flex: 1; background: #ff9500; color: white;" onclick="filterLeaves('pending')">
-                        <i class="fas fa-clock"></i> Pending
-                    </button>
-                    <button class="btn" style="flex: 1; background: #34c759; color: white;" onclick="filterLeaves('approved')">
-                        <i class="fas fa-check"></i> Approved
-                    </button>
-                    <button class="btn" style="flex: 1; background: #ff3b30; color: white;" onclick="filterLeaves('denied')">
-                        <i class="fas fa-times"></i> Denied
-                    </button>
+                    <button class="btn" style="flex: 1; background: #0071e3; color: white;" onclick="filterLeaves('all')">All</button>
+                    <button class="btn" style="flex: 1; background: #ff9500; color: white;" onclick="filterLeaves('pending')">Pending</button>
+                    <button class="btn" style="flex: 1; background: #34c759; color: white;" onclick="filterLeaves('approved')">Approved</button>
+                    <button class="btn" style="flex: 1; background: #ff3b30; color: white;" onclick="filterLeaves('denied')">Denied</button>
                 </div>
 
                 <div id="leaveApplicationsList">
-                    <div style="text-align: center; padding: 40px; color: #86868b;">Loading leave applications...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Holidays Tab -->
-        <div id="holidays" class="tab-content">
-            <div class="card">
-                <h2>
-                    <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                    University Holidays 2026
-                </h2>
-                
-                <div class="holiday-stats">
-                    <div class="stat-box" style="background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);">
-                        <div class="stat-label" style="color: rgba(255,255,255,0.8);">General Holidays</div>
-                        <div class="stat-value" id="generalHolidayCount" style="color: white;">21</div>
-                    </div>
-                    <div class="stat-box" style="background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);">
-                        <div class="stat-label" style="color: rgba(255,255,255,0.8);">Restricted</div>
-                        <div class="stat-value" id="restrictedHolidayCount" style="color: white;">1</div>
-                    </div>
-                    <div class="stat-box" style="background: linear-gradient(135deg, #34c759 0%, #30d158 100%);">
-                        <div class="stat-label" style="color: rgba(255,255,255,0.8);">Special Holidays</div>
-                        <div class="stat-value" id="specialHolidayCount" style="color: white;">8</div>
-                    </div>
-                    <div class="stat-box" style="background: linear-gradient(135deg, #af52de 0%, #9747ff 100%);">
-                        <div class="stat-label" style="color: rgba(255,255,255,0.8);">Saturday Holidays</div>
-                        <div class="stat-value" id="saturdayHolidayCount" style="color: white;">5</div>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #1d1d1f;">Filter by Month:</label>
-                    <select id="holidayMonthFilter" style="padding: 10px 14px; border-radius: 10px; border: 1px solid #d2d2d7; background: #f5f5f7; color: #1d1d1f; font-size: 0.9rem; cursor: pointer;">
-                        <option value="all">All Months</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-
-                <div id="holidayListAdmin" style="display: grid; gap: 12px;">
-                    <!-- Holiday items will be inserted here -->
+                    <div style="text-align: center; padding: 40px; color: #86868b;">Loading...</div>
                 </div>
             </div>
         </div>
@@ -1030,7 +658,7 @@
             <div class="card">
                 <h2>
                     <div class="card-icon"><i class="fas fa-download"></i></div>
-                    Export Attendance
+                    Export Attendance Data
                 </h2>
                 <form method="GET" action="{{ url_for('admin_export') }}" class="form-grid">
                     <div class="form-group">
@@ -1051,14 +679,14 @@
         </div>
     </div>
 
-    <!-- Detail Modal -->
-    <div id="detailModal" class="modal">
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Details</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <h3 id="userModalTitle">User Details</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
             </div>
-            <div id="modalBody"></div>
+            <div id="userModalBody"></div>
         </div>
     </div>
 
@@ -1066,22 +694,14 @@
     <div id="leaveReviewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-clipboard-check"></i> Review Leave Application</h3>
+                <h3>Review Leave Application</h3>
                 <button class="modal-close" onclick="closeLeaveReviewModal()">&times;</button>
             </div>
-            <div id="leaveReviewContent">
-                <!-- Leave details will be populated here -->
-            </div>
+            <div id="leaveReviewContent"></div>
         </div>
     </div>
 
     <script>
-        let currentMonth = new Date();
-        let calendarData = {};
-        let selectedUserId = null;
-        const userColors = ['#0071e3', '#34c759', '#ff3b30', '#ffd60a', '#ff9500', '#af52de', '#ff2d55', '#5ac8fa'];
-        let userColorMap = {};
-        let holidayDataAdmin = {};
         let currentLeaveFilter = 'all';
         let allLeaveApplications = [];
 
@@ -1093,9 +713,20 @@
             
             if (tab === 'users') {
                 loadUserStats();
-            } else if (tab === 'holidays') {
-                loadAllHolidays();
-            } else if (tab === 'leave-management') {
+            } else if (tab === 'early-logouts') {
+                loadEarlyLogouts();
+            } else if (tab === 'shift-usage') {
+                // Set default dates
+                const end = new Date();
+                const start = new Date();
+                start.setDate(start.getDate() - 30);
+                document.getElementById('shiftStartDate').value = start.toISOString().split('T')[0];
+                document.getElementById('shiftEndDate').value = end.toISOString().split('T')[0];
+                loadShiftUsage();
+            } else if (tab === 'locations') {
+                document.getElementById('locationDate').value = new Date().toISOString().split('T')[0];
+                loadLocations();
+            } else if (tab === 'leaves') {
                 loadLeaveApplications();
             }
         }
@@ -1109,18 +740,21 @@
                         const data = await res.json();
                         const statsDiv = document.getElementById(`stats-${user._id}`);
                         if (statsDiv && data) {
+                            const shift1Count = data.shift_usage?.shift1?.count || 0;
+                            const shift2Count = data.shift_usage?.shift2?.count || 0;
+                            
                             statsDiv.innerHTML = `
-                                <div class="stat-item">
-                                    <div class="stat-value">${data.total_working_days || 0}</div>
-                                    <div class="stat-label">Working Days</div>
-                                </div>
                                 <div class="stat-item">
                                     <div class="stat-value">${data.attendance_this_month || 0}</div>
                                     <div class="stat-label">This Month</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">${data.leaves_this_month || 0}</div>
-                                    <div class="stat-label">Leaves</div>
+                                    <div class="stat-value">${shift1Count}</div>
+                                    <div class="stat-label">Shift 1</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">${shift2Count}</div>
+                                    <div class="stat-label">Shift 2</div>
                                 </div>
                             `;
                         }
@@ -1131,10 +765,108 @@
             }
         }
 
-        async function deleteUser(userId, username) {
-            if (!confirm(`Are you sure you want to delete user "${username}"? This will also delete all their attendance and leave records.`)) {
-                return;
+        async function viewUserDetails(userId) {
+            try {
+                const res = await fetch(`/api/admin/user-stats/${userId}`);
+                const data = await res.json();
+                
+                const modal = document.getElementById('userModal');
+                const title = document.getElementById('userModalTitle');
+                const body = document.getElementById('userModalBody');
+                
+                title.textContent = `${data.username}'s Details`;
+                const shiftTarget = (data.work_hours_target / 2).toFixed(1);
+                
+                let shiftHtml = '';
+                if (data.shift_usage) {
+                    shiftHtml = '<h4 style="margin: 20px 0 10px;">Shift Usage</h4>';
+                    Object.entries(data.shift_usage).forEach(([shift, stats]) => {
+                        shiftHtml += `
+                            <div class="shift-stat-card">
+                                <div class="shift-stat-header">
+                                    <span class="shift-stat-name">${stats.name}</span>
+                                    <span class="shift-stat-count">${stats.count} sessions</span>
+                                </div>
+                                <div>Total Hours: ${stats.total_hours.toFixed(1)} hrs</div>
+                                <div>Target per shift: ${shiftTarget} hrs</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                body.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="value">${data.total_working_days || 0}</div>
+                            <div class="label">Total Days</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">${data.attendance_this_month || 0}</div>
+                            <div class="label">This Month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">${data.leaves_this_month || 0}</div>
+                            <div class="label">Leaves</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">${data.work_hours_target || 8}</div>
+                            <div class="label">Target/Day</div>
+                        </div>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+                        <p><strong>Preferred Shift:</strong> ${data.preferred_shift || 'Not set'}</p>
+                        <p><strong>Per Shift Target:</strong> ${shiftTarget} hours</p>
+                        <p><strong>Total Shift Sessions:</strong> ${data.total_shift_sessions || 0}</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <label><strong>Update Work Hours Target:</strong></label>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="number" id="newWorkHours" value="${data.work_hours_target || 8}" step="0.5" min="1" max="12" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #d2d2d7;">
+                            <button class="btn btn-primary" onclick="updateWorkHours('${userId}')">Update</button>
+                        </div>
+                        <small style="color: #86868b;">Each shift will get half of this target</small>
+                    </div>
+                    ${shiftHtml}
+                `;
+                
+                modal.classList.add('active');
+            } catch (e) {
+                console.error('Error loading user details:', e);
+                alert('Failed to load user details');
             }
+        }
+
+        async function updateWorkHours(userId) {
+            const newHours = document.getElementById('newWorkHours').value;
+            
+            try {
+                const res = await fetch('/api/admin/update-user-work-hours', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, work_hours: parseFloat(newHours) })
+                });
+                
+                const data = await res.json();
+                
+                if (data.ok) {
+                    alert(data.message);
+                    closeUserModal();
+                    loadUserStats();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (e) {
+                alert('Failed to update work hours');
+            }
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('active');
+        }
+
+        async function deleteUser(userId, username) {
+            if (!confirm(`Are you sure you want to delete user "${username}"?`)) return;
             
             try {
                 const res = await fetch(`/admin/delete_user/${userId}`, { method: 'POST' });
@@ -1151,394 +883,207 @@
             }
         }
 
-        async function viewUserCalendar(userId, username) {
-            selectedUserId = userId;
-            
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab')[1].classList.add('active');
-            document.getElementById('calendar').classList.add('active');
-            
-            const select = document.getElementById('userFilter');
-            for (let opt of select.options) {
-                opt.selected = opt.value === userId;
-            }
-            
-            await loadCalendarData();
-            
+        async function loadEarlyLogouts() {
             try {
-                const res = await fetch(`/api/admin/user-stats/${userId}`);
-                const stats = await res.json();
-                
-                const modal = document.getElementById('detailModal');
-                const title = document.getElementById('modalTitle');
-                const body = document.getElementById('modalBody');
-                
-                title.textContent = `${username}'s Statistics`;
-                body.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
-                        <div style="text-align: center; padding: 20px; background: #f5f5f7; border-radius: 12px;">
-                            <div style="font-size: 2rem; font-weight: 700; color: #0071e3;">${stats.total_working_days || 0}</div>
-                            <div style="font-size: 0.8rem; color: #6e6e73; margin-top: 4px;">TOTAL WORKING DAYS</div>
-                        </div>
-                        <div style="text-align: center; padding: 20px; background: #f5f5f7; border-radius: 12px;">
-                            <div style="font-size: 2rem; font-weight: 700; color: #34c759;">${stats.attendance_this_month || 0}</div>
-                            <div style="font-size: 0.8rem; color: #6e6e73; margin-top: 4px;">ATTENDANCE THIS MONTH</div>
-                        </div>
-                        <div style="text-align: center; padding: 20px; background: #f5f5f7; border-radius: 12px;">
-                            <div style="font-size: 2rem; font-weight: 700; color: #ff9500;">${stats.leaves_this_month || 0}</div>
-                            <div style="font-size: 0.8rem; color: #6e6e73; margin-top: 4px;">LEAVES THIS MONTH</div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; color: #6e6e73; font-size: 0.9rem;">
-                        <i class="fas fa-envelope"></i> ${stats.email || 'No email'}
-                    </div>
-                `;
-                
-                modal.classList.add('active');
-            } catch (e) {
-                console.error('Error loading user stats:', e);
-            }
-        }
-
-        function selectAllUsers() {
-            const select = document.getElementById('userFilter');
-            for (let opt of select.options) {
-                opt.selected = true;
-            }
-        }
-
-        async function loadCalendarData() {
-            const select = document.getElementById('userFilter');
-            const selected = Array.from(select.selectedOptions).map(o => o.value);
-            
-            if (selected.length === 0) {
-                alert('Please select at least one user');
-                return;
-            }
-
-            const params = new URLSearchParams();
-            selected.forEach(u => params.append('users', u));
-            
-            const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-            const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-            params.append('start_date', start.toISOString().split('T')[0]);
-            params.append('end_date', end.toISOString().split('T')[0]);
-
-            try {
-                const res = await fetch(`/api/admin/calendar-data?${params}`);
-                const data = await res.json();
-                calendarData = data.calendar_data;
-                
-                await loadAdminMonthHolidays();
-                
-                renderUserLegend();
-                renderCalendar();
-            } catch (e) {
-                console.error('Error loading calendar data:', e);
-                alert('Failed to load calendar data');
-            }
-        }
-
-        async function loadAdminMonthHolidays() {
-            try {
-                const year = currentMonth.getFullYear();
-                const month = currentMonth.getMonth() + 1;
-                const res = await fetch(`/api/holidays?year=2026&month=${month}`);
+                const res = await fetch('/api/admin/early-logouts');
                 const data = await res.json();
                 
-                holidayDataAdmin = data.holidays;
-            } catch (e) {
-                console.error('Error loading admin holidays:', e);
-            }
-        }
-
-        function renderUserLegend() {
-            const usernames = Object.keys(calendarData);
-            const legend = document.getElementById('userLegend');
-            
-            userColorMap = {};
-            usernames.forEach((username, i) => {
-                userColorMap[username] = userColors[i % userColors.length];
-            });
-            
-            legend.innerHTML = usernames.map((username, i) => {
-                const color = userColors[i % userColors.length];
-                return `
-                    <div class="user-badge-legend" style="background: ${color}; color: white; border-color: ${color};">
-                        ${username}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const monthEl = document.getElementById('calendarMonth');
-            
-            const year = currentMonth.getFullYear();
-            const month = currentMonth.getMonth();
-            
-            monthEl.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-            
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startingDayOfWeek = firstDay.getDay();
-            
-            const prevMonthLastDay = new Date(year, month, 0).getDate();
-            
-            grid.innerHTML = '';
-            
-            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'calendar-day-header';
-                header.textContent = day;
-                grid.appendChild(header);
-            });
-            
-            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-                const dayEl = createCalendarDay(prevMonthLastDay - i, true);
-                grid.appendChild(dayEl);
-            }
-            
-            const today = new Date();
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
-                const dayEl = createCalendarDay(day, false, isToday);
-                grid.appendChild(dayEl);
-            }
-            
-            const remainingCells = 42 - grid.children.length + 7;
-            for (let i = 1; i <= remainingCells; i++) {
-                const dayEl = createCalendarDay(i, true);
-                grid.appendChild(dayEl);
-            }
-        }
-
-        function createCalendarDay(dayNum, otherMonth, isToday = false) {
-            const dayEl = document.createElement('div');
-            dayEl.className = 'calendar-day';
-            if (otherMonth) dayEl.classList.add('other-month');
-            if (isToday) dayEl.classList.add('today');
-            
-            const dateStr = !otherMonth 
-                ? `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
-                : null;
-            
-            dayEl.innerHTML = `<div class="calendar-day-number">${dayNum}</div>`;
-            
-            if (!otherMonth && dateStr) {
-                const dotsContainer = document.createElement('div');
-                dotsContainer.className = 'status-dots';
+                const container = document.getElementById('earlyLogoutsList');
                 
-                if (holidayDataAdmin[dateStr]) {
-                    const holidayBadge = document.createElement('div');
-                    holidayBadge.style.cssText = 'background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-top: 2px;';
-                    holidayBadge.textContent = '🎉';
-                    dayEl.appendChild(holidayBadge);
+                if (data.early_logouts.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #34c759;">
+                            <i class="fas fa-check-circle" style="font-size: 3em; margin-bottom: 16px;"></i>
+                            <p>No early logouts today! Everyone met their targets.</p>
+                        </div>
+                    `;
+                    return;
                 }
                 
-                Object.keys(calendarData).forEach(username => {
-                    if (calendarData[username][dateStr]) {
-                        const entry = calendarData[username][dateStr];
-                        const dot = document.createElement('div');
-                        dot.className = 'status-dot';
-                        
-                        if (entry.type === 'present') {
-                            dot.style.background = userColorMap[username];
-                        } else if (entry.type === 'leave') {
-                            dot.style.background = '#ff9500';
-                        }
-                        
-                        dotsContainer.appendChild(dot);
-                    }
-                });
-                
-                if (dotsContainer.children.length > 0) {
-                    dayEl.appendChild(dotsContainer);
-                }
-                
-                dayEl.onclick = () => showDayDetails(dateStr);
-            }
-            
-            return dayEl;
-        }
-
-        function showDayDetails(dateStr) {
-            const modal = document.getElementById('detailModal');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            
-            title.textContent = `Details for ${dateStr}`;
-            
-            let html = '<div style="display: flex; flex-direction: column; gap: 16px;">';
-            
-            if (holidayDataAdmin[dateStr]) {
-                const holiday = holidayDataAdmin[dateStr];
-                const dateObj = new Date(dateStr);
-                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                
-                html += `
-                    <div style="padding: 20px; background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%); border-radius: 12px; color: white;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <div style="font-size: 2em;">🎉</div>
+                container.innerHTML = data.early_logouts.map(item => `
+                    <div class="early-logout-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="font-size: 1.1em;">${item.username}</strong>
+                            <span class="shift-stat-count">${item.shift_name}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0;">
                             <div>
-                                <div style="font-size: 1.2rem; font-weight: 700;">${holiday.name}</div>
-                                <div style="font-size: 0.9rem; opacity: 0.9;">${dayName}, ${dateStr}</div>
+                                <div style="font-size: 0.7em; color: #6e6e73;">Worked</div>
+                                <div style="font-weight: 700; color: #ff3b30;">${item.hours_worked} hrs</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7em; color: #6e6e73;">Target</div>
+                                <div style="font-weight: 700;">${item.target_hours} hrs</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7em; color: #6e6e73;">Shortfall</div>
+                                <div style="font-weight: 700; color: #ff9500;">${item.shortfall} hrs</div>
                             </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; display: inline-block; font-size: 0.8rem; font-weight: 600;">
-                            ${holiday.type.toUpperCase()} HOLIDAY
+                        <div style="font-size: 0.85em; color: #6e6e73; margin-top: 8px;">
+                            <div>Login: ${item.login_time}</div>
+                            <div>Logout: ${item.logout_time}</div>
+                            <div class="place-name">Login: ${item.login_place}</div>
+                            <div class="place-name">Logout: ${item.logout_place}</div>
                         </div>
                     </div>
-                `;
-            }
-            
-            Object.keys(calendarData).forEach(username => {
-                if (calendarData[username][dateStr]) {
-                    const entry = calendarData[username][dateStr];
-                    const color = userColorMap[username];
-                    
-                    if (entry.type === 'present') {
-                        html += `
-                            <div style="padding: 16px; background: #f5f5f7; border-radius: 12px; border-left: 4px solid ${color};">
-                                <div style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">${username}</div>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 0.9rem; color: #6e6e73;">
-                                    <div>
-                                        <div style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px;">Login</div>
-                                        <div style="color: #1d1d1f; font-weight: 500;">${entry.login_time}</div>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px;">Logout</div>
-                                        <div style="color: #1d1d1f; font-weight: 500;">${entry.logout_time}</div>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px;">Hours</div>
-                                        <div style="color: #0071e3; font-weight: 700;">${entry.hours}h</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else if (entry.type === 'leave') {
-                        html += `
-                            <div style="padding: 16px; background: #fff9e6; border-radius: 12px; border-left: 4px solid #ff9500;">
-                                <div style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">${username}</div>
-                                <div style="font-size: 0.9rem; color: #6e6e73;">
-                                    <div style="margin-bottom: 4px;"><strong>Leave Type:</strong> ${entry.leave_type}</div>
-                                    ${entry.comments ? `<div><strong>Comments:</strong> ${entry.comments}</div>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-            });
-            
-            html += '</div>';
-            body.innerHTML = html || '<p style="text-align: center; color: #6e6e73;">No records for this day</p>';
-            
-            modal.classList.add('active');
-        }
-
-        function changeMonth(delta) {
-            currentMonth.setMonth(currentMonth.getMonth() + delta);
-            loadCalendarData();
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').classList.remove('active');
-        }
-
-        // Holidays functions
-        async function loadAllHolidays() {
-            try {
-                const res = await fetch('/api/holidays');
-                const data = await res.json();
-                
-                const holidays = Object.entries(data.holidays).map(([date, info]) => ({
-                    date: date,
-                    ...info
-                })).sort((a, b) => new Date(a.date) - new Date(b.date));
-                
-                const counts = {
-                    general: holidays.filter(h => h.type === 'general').length,
-                    restricted: holidays.filter(h => h.type === 'restricted').length,
-                    special: holidays.filter(h => h.type === 'special').length,
-                    saturday: holidays.filter(h => h.type === 'saturday').length
-                };
-                
-                document.getElementById('generalHolidayCount').textContent = counts.general;
-                document.getElementById('restrictedHolidayCount').textContent = counts.restricted;
-                document.getElementById('specialHolidayCount').textContent = counts.special;
-                document.getElementById('saturdayHolidayCount').textContent = counts.saturday;
-                
-                renderHolidayList(holidays);
-                
-                document.getElementById('holidayMonthFilter').addEventListener('change', function() {
-                    filterHolidays(holidays, this.value);
-                });
+                `).join('');
                 
             } catch (e) {
-                console.error('Error loading holidays:', e);
-                document.getElementById('holidayListAdmin').innerHTML = '<div style="text-align: center; padding: 40px; color: #ff3b30;">Failed to load holidays</div>';
+                console.error('Error loading early logouts:', e);
+                document.getElementById('earlyLogoutsList').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ff3b30;">Failed to load data</div>
+                `;
             }
         }
 
-        function renderHolidayList(holidays) {
-            const container = document.getElementById('holidayListAdmin');
+        async function loadShiftUsage() {
+            const start = document.getElementById('shiftStartDate').value;
+            const end = document.getElementById('shiftEndDate').value;
             
-            if (holidays.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #86868b;">No holidays found</div>';
+            if (!start || !end) {
+                alert('Please select start and end dates');
                 return;
             }
             
-            container.innerHTML = holidays.map(holiday => {
-                const date = new Date(holiday.date);
-                const day = date.getDate();
-                const month = date.toLocaleDateString('en-US', { month: 'short' });
-                const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+            try {
+                const res = await fetch(`/api/admin/shift-usage?start_date=${start}&end_date=${end}`);
+                const data = await res.json();
                 
-                const icons = {
-                    general: '🎉',
-                    restricted: '⭐',
-                    special: '🎊',
-                    saturday: '📅'
-                };
+                const container = document.getElementById('shiftStats');
                 
-                return `
-                    <div class="holiday-item-admin ${holiday.type}">
-                        <div class="holiday-date-box">
-                            <div class="holiday-date-day">${day}</div>
-                            <div class="holiday-date-month">${month}</div>
-                            <div class="holiday-date-weekday">${weekday}</div>
+                if (data.total_shift_sessions === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #86868b;">
+                            No shift sessions in this period
                         </div>
-                        <div class="holiday-info">
-                            <div class="holiday-title">${holiday.name}</div>
-                            <div class="holiday-meta">
-                                <span class="holiday-type-badge ${holiday.type}">${holiday.type}</span>
-                                <span style="font-size: 0.85em; color: #86868b;">${holiday.date}</span>
+                    `;
+                    return;
+                }
+                
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="value">${data.total_shift_sessions}</div>
+                            <div class="label">Total Shift Sessions</div>
+                        </div>
+                    </div>
+                    <h3 style="margin: 20px 0 10px;">Shift Breakdown</h3>
+                `;
+                
+                Object.entries(data.shift_stats).forEach(([shift, stats]) => {
+                    html += `
+                        <div class="shift-stat-card">
+                            <div class="shift-stat-header">
+                                <span class="shift-stat-name">${stats.name}</span>
+                                <span class="shift-stat-count">${stats.count} sessions</span>
+                            </div>
+                            <div style="display: flex; gap: 20px; margin-top: 8px;">
+                                <div><strong>Total Hours:</strong> ${stats.total_hours.toFixed(1)} hrs</div>
+                                <div><strong>Unique Users:</strong> ${stats.unique_users}</div>
                             </div>
                         </div>
-                        <div class="holiday-icon">${icons[holiday.type] || '📅'}</div>
-                    </div>
+                    `;
+                });
+                
+                html += '<h3 style="margin: 20px 0 10px;">User Breakdown</h3>';
+                
+                Object.entries(data.user_shift_stats).forEach(([username, shifts]) => {
+                    html += `
+                        <div style="background: #f5f5f7; border-radius: 10px; padding: 16px; margin-bottom: 12px;">
+                            <strong style="font-size: 1.1em;">${username}</strong>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                    `;
+                    
+                    Object.entries(shifts).forEach(([shift, stats]) => {
+                        html += `
+                            <div>
+                                <div style="font-size: 0.8em; color: #6e6e73;">${stats.name}</div>
+                                <div><strong>${stats.count}</strong> sessions (${stats.total_hours.toFixed(1)} hrs)</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div></div>';
+                });
+                
+                container.innerHTML = html;
+                
+            } catch (e) {
+                console.error('Error loading shift usage:', e);
+                document.getElementById('shiftStats').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ff3b30;">Failed to load data</div>
                 `;
-            }).join('');
+            }
         }
 
-        function filterHolidays(allHolidays, monthFilter) {
-            if (monthFilter === 'all') {
-                renderHolidayList(allHolidays);
+        async function loadLocations() {
+            const date = document.getElementById('locationDate').value;
+            
+            if (!date) {
+                alert('Please select a date');
                 return;
             }
             
-            const filtered = allHolidays.filter(holiday => {
-                const date = new Date(holiday.date);
-                return date.getMonth() + 1 === parseInt(monthFilter);
-            });
-            
-            renderHolidayList(filtered);
+            try {
+                const res = await fetch(`/api/admin/user-locations/${date}`);
+                const data = await res.json();
+                
+                const container = document.getElementById('locationsList');
+                
+                if (data.locations.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #86868b;">
+                            No attendance records for this date
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.locations.map(item => {
+                    const shiftClass = item.shift_type === 'shift1' ? '#0071e3' : 
+                                      (item.shift_type === 'shift2' ? '#ff9500' : '#86868b');
+                    
+                    return `
+                    <div class="location-item" style="border-left-color: ${shiftClass};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong>${item.username}</strong>
+                            <span class="shift-stat-count" style="background: ${shiftClass};">${item.shift_name} (Session ${item.session_number})</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 10px 0;">
+                            <div>
+                                <div style="font-size: 0.8em; color: #6e6e73; margin-bottom: 4px;">Login</div>
+                                <div>${item.login_time}</div>
+                                <div class="place-name">${item.login_place}</div>
+                                <div class="location-coords">
+                                    Lat: ${item.login_lat?.toFixed(6) || 'N/A'}, Lng: ${item.login_lng?.toFixed(6) || 'N/A'}
+                                </div>
+                            </div>
+                            ${item.logout_time ? `
+                            <div>
+                                <div style="font-size: 0.8em; color: #6e6e73; margin-bottom: 4px;">Logout</div>
+                                <div>${item.logout_time}</div>
+                                <div class="place-name">${item.logout_place || 'N/A'}</div>
+                                <div class="location-coords">
+                                    Lat: ${item.logout_lat?.toFixed(6) || 'N/A'}, Lng: ${item.logout_lng?.toFixed(6) || 'N/A'}
+                                </div>
+                            </div>
+                            ` : '<div>Not logged out yet</div>'}
+                        </div>
+                        <div style="margin-top: 8px; color: #6e6e73; font-size: 0.9em;">
+                            Hours worked: ${item.hours} hrs
+                        </div>
+                    </div>
+                `}).join('');
+                
+            } catch (e) {
+                console.error('Error loading locations:', e);
+                document.getElementById('locationsList').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ff3b30;">Failed to load data</div>
+                `;
+            }
         }
 
-        // Leave Management Functions
         async function loadLeaveApplications() {
             try {
                 const res = await fetch(`/api/admin/leave-applications?status=${currentLeaveFilter}`);
@@ -1550,7 +1095,6 @@
                 console.error('Error loading leave applications:', err);
                 document.getElementById('leaveApplicationsList').innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ff3b30;">
-                        <i class="fas fa-exclamation-circle" style="font-size: 3em; margin-bottom: 16px;"></i>
                         <p>Failed to load leave applications</p>
                     </div>
                 `;
@@ -1563,7 +1107,6 @@
             if (!applications || applications.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #86868b;">
-                        <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 16px; opacity: 0.3;"></i>
                         <p>No leave applications found</p>
                     </div>
                 `;
@@ -1572,48 +1115,36 @@
 
             container.innerHTML = applications.map(app => {
                 const date = new Date(app.date);
-                const day = date.getDate();
-                const month = date.toLocaleDateString('en-US', { month: 'short' });
-                const appliedDate = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-US') : 'N/A';
+                const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+                
+                const statusColors = {
+                    pending: '#ff9500',
+                    approved: '#34c759',
+                    denied: '#ff3b30'
+                };
                 
                 return `
-                    <div class="leave-application-card ${app.status}">
-                        <div class="leave-date-box">
-                            <div class="leave-date-day">${day}</div>
-                            <div class="leave-date-month">${month}</div>
+                    <div class="early-logout-item" style="border-left-color: ${statusColors[app.status]};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong>${app.username}</strong>
+                            <span style="background: ${statusColors[app.status]}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600;">
+                                ${app.status.toUpperCase()}
+                            </span>
                         </div>
-                        
-                        <div class="leave-info">
-                            <div class="leave-username">${app.username}</div>
-                            <div class="leave-meta">
-                                <div class="leave-meta-item">
-                                    <i class="fas fa-envelope"></i> <strong>${app.user_email || 'No email'}</strong>
-                                </div>
-                                <div class="leave-meta-item">
-                                    <i class="fas fa-calendar"></i> Applied: <strong>${appliedDate}</strong>
-                                </div>
-                                <span class="leave-type-badge">${app.type}</span>
-                            </div>
-                            ${app.comments ? `
-                                <div style="background: #f5f5f7; padding: 12px; border-radius: 8px; margin-top: 8px; font-size: 0.9em;">
-                                    <strong>Reason:</strong> ${app.comments}
-                                </div>
-                            ` : ''}
-                            ${app.admin_comments && app.status !== 'pending' ? `
-                                <div style="background: #e8f4fd; padding: 12px; border-radius: 8px; margin-top: 8px; font-size: 0.9em; border-left: 3px solid #0071e3;">
-                                    <strong>Admin Comments:</strong> ${app.admin_comments}
-                                </div>
-                            ` : ''}
+                        <div><strong>Date:</strong> ${formattedDate}</div>
+                        <div><strong>Type:</strong> ${app.type}</div>
+                        ${app.comments ? `<div><strong>Reason:</strong> ${app.comments}</div>` : ''}
+                        ${app.admin_comments ? `<div><strong>Admin Comments:</strong> ${app.admin_comments}</div>` : ''}
+                        <div style="font-size: 0.85em; color: #6e6e73; margin-top: 8px;">
+                            Applied: ${new Date(app.applied_at).toLocaleString()}
                         </div>
-                        
-                        <div class="leave-actions">
-                            <span class="leave-status-badge ${app.status}">${app.status}</span>
-                            ${app.status === 'pending' ? `
-                                <button class="btn-review" onclick="openLeaveReview('${app.id}')">
-                                    <i class="fas fa-clipboard-check"></i> Review
+                        ${app.status === 'pending' ? `
+                            <div style="margin-top: 12px;">
+                                <button class="btn btn-primary btn-sm" onclick="openLeaveReview('${app.id}')">
+                                    Review Application
                                 </button>
-                            ` : ''}
-                        </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
@@ -1628,52 +1159,26 @@
             const app = allLeaveApplications.find(a => a.id === leaveId);
             if (!app) return;
             
-            const date = new Date(app.date);
-            const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
             const content = document.getElementById('leaveReviewContent');
             content.innerHTML = `
-                <div style="background: #f5f5f7; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                        <div>
-                            <div style="font-size: 0.75em; color: #86868b; text-transform: uppercase; margin-bottom: 4px;">Employee</div>
-                            <div style="font-size: 1.1em; font-weight: 700; color: #1d1d1f;">${app.username}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.75em; color: #86868b; text-transform: uppercase; margin-bottom: 4px;">Email</div>
-                            <div style="font-size: 0.9em; color: #0071e3;">${app.user_email || 'No email'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.75em; color: #86868b; text-transform: uppercase; margin-bottom: 4px;">Leave Date</div>
-                            <div style="font-size: 1em; font-weight: 600; color: #1d1d1f;">${formattedDate}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.75em; color: #86868b; text-transform: uppercase; margin-bottom: 4px;">Leave Type</div>
-                            <div><span class="leave-type-badge">${app.type}</span></div>
-                        </div>
-                    </div>
-                    
-                    ${app.comments ? `
-                        <div style="margin-top: 16px;">
-                            <div style="font-size: 0.75em; color: #86868b; text-transform: uppercase; margin-bottom: 8px;">Reason</div>
-                            <div style="background: white; padding: 16px; border-radius: 8px; color: #1d1d1f;">
-                                ${app.comments}
-                            </div>
-                        </div>
-                    ` : ''}
+                <div style="margin-bottom: 24px;">
+                    <p><strong>Employee:</strong> ${app.username}</p>
+                    <p><strong>Date:</strong> ${app.date}</p>
+                    <p><strong>Type:</strong> ${app.type}</p>
+                    ${app.comments ? `<p><strong>Reason:</strong> ${app.comments}</p>` : ''}
                 </div>
-
+                
                 <div class="form-group">
-                    <label>Admin Comments (Optional)</label>
-                    <textarea id="adminComments" style="min-height: 120px;" placeholder="Add your comments here..."></textarea>
+                    <label>Admin Comments</label>
+                    <textarea id="adminComments" style="min-height: 100px;"></textarea>
                 </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px;">
-                    <button class="btn" style="background: #34c759; color: white; padding: 14px; font-size: 1em;" onclick="updateLeaveStatus('${leaveId}', 'approved')">
-                        <i class="fas fa-check-circle"></i> Approve Leave
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <button class="btn btn-success" onclick="updateLeaveStatus('${leaveId}', 'approved')">
+                        Approve
                     </button>
-                    <button class="btn" style="background: #ff3b30; color: white; padding: 14px; font-size: 1em;" onclick="updateLeaveStatus('${leaveId}', 'denied')">
-                        <i class="fas fa-times-circle"></i> Deny Leave
+                    <button class="btn btn-danger" onclick="updateLeaveStatus('${leaveId}', 'denied')">
+                        Deny
                     </button>
                 </div>
             `;
@@ -1686,13 +1191,7 @@
         }
 
         async function updateLeaveStatus(leaveId, status) {
-            const adminComments = document.getElementById('adminComments').value.trim();
-            
-            const confirmMsg = status === 'approved' 
-                ? 'Are you sure you want to approve this leave application?' 
-                : 'Are you sure you want to deny this leave application?';
-            
-            if (!confirm(confirmMsg)) return;
+            const adminComments = document.getElementById('adminComments').value;
             
             try {
                 const res = await fetch(`/api/admin/leave/${leaveId}/update`, {
@@ -1704,28 +1203,24 @@
                 const data = await res.json();
                 
                 if (data.ok) {
-                    alert(`✅ ${data.message}`);
+                    alert(`Leave ${status} successfully`);
                     closeLeaveReviewModal();
                     loadLeaveApplications();
                 } else {
-                    alert(`❌ Error: ${data.error}`);
+                    alert('Error: ' + data.error);
                 }
             } catch (err) {
-                alert(`Failed to update leave status: ${err.message}`);
+                alert('Failed to update leave status');
             }
         }
 
-        // Event listeners
-        document.getElementById('detailModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+        // Close modals when clicking outside
+        document.getElementById('userModal').addEventListener('click', function(e) {
+            if (e.target === this) closeUserModal();
         });
-
+        
         document.getElementById('leaveReviewModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeLeaveReviewModal();
-            }
+            if (e.target === this) closeLeaveReviewModal();
         });
 
         // Initialize on load
