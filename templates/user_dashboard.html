@@ -1,2173 +1,1406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JAIN University - Office of Academics Attendance Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
-            line-height: 1.5;
-            min-height: 100vh;
-        }
-
-        /* Navigation Bar - Rounded */
-        .navbar {
-            background: white;
-            padding: 12px 32px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            position: sticky;
-            top: 20px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(0, 113, 227, 0.1);
-            margin: 20px 32px;
-            border-radius: 60px;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .university-logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #0071e3, #005bb5);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0, 113, 227, 0.3);
-        }
-
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand-text .university-name {
-            font-size: 0.85rem;
-            color: #86868b;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .brand-text .office-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1d1d1f;
-            line-height: 1.3;
-        }
-
-        .brand-text .office-name span {
-            color: #0071e3;
-        }
-
-        .navbar-tabs {
-            display: flex;
-            gap: 8px;
-            background: #f5f5f7;
-            padding: 6px;
-            border-radius: 50px;
-        }
-
-        .nav-tab {
-            padding: 10px 24px;
-            border: none;
-            background: transparent;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #86868b;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .nav-tab i {
-            font-size: 1.1rem;
-        }
-
-        .nav-tab:hover {
-            color: #0071e3;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #0071e3;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .navbar-menu {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .time-display {
-            background: #f5f5f7;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #1d1d1f;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            border: 1px solid #e5e5e7;
-        }
-
-        .logout-btn {
-            background: #ff3b30;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
-        }
-
-        .logout-btn:hover {
-            background: #ff2d55;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 59, 48, 0.3);
-        }
-
-        .dashboard-container {
-            max-width: 1600px;
-            margin: 0 auto 40px;
-            padding: 0 32px;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Welcome Section */
-        .welcome-section {
-            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
-            border-radius: 30px;
-            padding: 32px 40px;
-            margin-bottom: 32px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 113, 227, 0.2);
-        }
-
-        .welcome-section::before {
-            content: "🏛️";
-            position: absolute;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 120px;
-            opacity: 0.1;
-        }
-
-        .welcome-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .welcome-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 16px;
-        }
-
-        .office-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        /* Two Column Layout */
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        .left-column {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 30px;
-            padding: 28px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 15px 40px rgba(0, 113, 227, 0.12);
-            transform: translateY(-4px);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 8px 16px rgba(0, 113, 227, 0.2);
-        }
-
-        .card-header h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1d1d1f;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-box {
-            background: #f5f5f7;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #e5e5e7;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0071e3;
-            line-height: 1.2;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: #86868b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        /* Login/Logout Times Display */
-        .time-panel {
-            background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
-            border-radius: 20px;
-            padding: 20px;
-            margin: 20px 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .time-block {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        .time-block .label {
-            font-size: 0.8rem;
-            color: #86868b;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .time-block .time {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #1d1d1f;
-            line-height: 1.2;
-            margin-bottom: 8px;
-        }
-
-        .time-block .address {
-            font-size: 0.8rem;
-            color: #86868b;
-            background: #f5f5f7;
-            padding: 8px 12px;
-            border-radius: 30px;
-            display: inline-block;
-            max-width: 100%;
-            word-break: break-word;
-        }
-
-        .time-block.login .time {
-            color: #34c759;
-        }
-
-        .time-block.logout .time {
-            color: #ff3b30;
-        }
-
-        /* Shift Progress */
-        .shift-progress {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .shift-card {
-            background: #f5f5f7;
-            border-radius: 20px;
-            padding: 20px;
-            border-left: 4px solid #0071e3;
-        }
-
-        .shift-card.completed {
-            border-left-color: #34c759;
-            background: #e8f4fd;
-        }
-
-        .shift-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .shift-name {
-            font-weight: 700;
-            color: #1d1d1f;
-            font-size: 1.1rem;
-        }
-
-        .shift-hours {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #0071e3;
-        }
-
-        .shift-card.completed .shift-hours {
-            color: #34c759;
-        }
-
-        .shift-target {
-            font-size: 0.9rem;
-            color: #86868b;
-        }
-
-        /* Action Buttons */
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        .btn {
-            padding: 16px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-login {
-            background: #34c759;
-            color: white;
-            box-shadow: 0 8px 20px rgba(52, 199, 89, 0.3);
-        }
-
-        .btn-logout {
-            background: #ff3b30;
-            color: white;
-            box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
-        }
-
-        .btn-shift1 {
-            background: #0071e3;
-            color: white;
-            box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
-        }
-
-        .btn-shift2 {
-            background: #ff9500;
-            color: white;
-            box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
-        }
-
-        .btn-leave {
-            background: #ff9500;
-            color: white;
-            width: 100%;
-            border-radius: 40px;
-            margin-top: 16px;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Calendar */
-        .calendar-container {
-            background: white;
-            border-radius: 30px;
-            padding: 28px;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .calendar-month {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1d1d1f;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .calendar-nav-btn {
-            width: 44px;
-            height: 44px;
-            border: 1px solid #e5e5e7;
-            background: white;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.2rem;
-            color: #86868b;
-        }
-
-        .calendar-nav-btn:hover {
-            background: #0071e3;
-            color: white;
-            border-color: #0071e3;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-        }
-
-        .calendar-day-header {
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #86868b;
-            padding: 12px 0;
-            text-transform: uppercase;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            background: #f5f5f7;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            font-weight: 600;
-            border: 2px solid transparent;
-        }
-
-        .calendar-day:hover {
-            background: #e8e8ed;
-            transform: scale(1.05);
-        }
-
-        .calendar-day.today {
-            border-color: #0071e3;
-            background: #e8f4fd;
-        }
-
-        .calendar-day.present {
-            background: #d1f4e0;
-            color: #34c759;
-        }
-
-        .calendar-day.holiday {
-            background: linear-gradient(135deg, #ff9500, #ff6b00);
-            color: white;
-        }
-
-        .calendar-day.leave {
-            background: #fff3cd;
-            color: #ff9500;
-        }
-
-        .calendar-day .day-number {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .calendar-day .session-indicator {
-            display: flex;
-            gap: 3px;
-            margin-top: 4px;
-        }
-
-        .calendar-day .dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        /* Holiday Cards */
-        .holiday-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 8px;
-        }
-
-        .holiday-item {
-            background: #f5f5f7;
-            border-radius: 20px;
-            padding: 18px;
-            border-left: 4px solid #0071e3;
-            transition: all 0.2s;
-        }
-
-        .holiday-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .holiday-date {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .holiday-day {
-            font-weight: 700;
-            color: #1d1d1f;
-        }
-
-        .holiday-type {
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            background: #0071e3;
-            color: white;
-        }
-
-        .holiday-name {
-            font-weight: 600;
-            color: #1d1d1f;
-            margin-bottom: 4px;
-        }
-
-        .holiday-date-badge {
-            font-size: 0.8rem;
-            color: #86868b;
-        }
-
-        .count-badge {
-            background: #0071e3;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 40px;
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-header h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1d1d1f;
-        }
-
-        .modal-close {
-            background: #f5f5f7;
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 40px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-close:hover {
-            background: #ff3b30;
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1d1d1f;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #e5e5e7;
-            border-radius: 30px;
-            font-size: 1rem;
-            background: #f5f5f7;
-            transition: all 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0071e3;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
-        }
-
-        .alert {
-            position: fixed;
-            top: 100px;
-            right: 32px;
-            padding: 16px 28px;
-            border-radius: 60px;
-            background: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 3000;
-            animation: slideIn 0.3s ease;
-            border-left: 4px solid;
-            font-weight: 500;
-        }
-
-        .alert-success { border-left-color: #34c759; }
-        .alert-danger { border-left-color: #ff3b30; }
-        .alert-warning { border-left-color: #ff9500; }
-
-        .loading {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        @media (max-width: 1200px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-            
-            .navbar {
-                flex-direction: column;
-                gap: 16px;
-                border-radius: 30px;
-                margin: 16px;
-                padding: 16px;
-            }
-            
-            .navbar-tabs {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JAIN Attendance</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#0071e3; --blue2:#005bb5;
+  --green:#30c75e; --red:#ff3b30; --orange:#ff9500; --purple:#7c3aed;
+  --bg:#f2f2f7; --card:#fff;
+  --t1:#1d1d1f; --t2:#6e6e73; --t3:#aeaeb2;
+  --bdr:#e5e5e7;
+  --nav:60px; --bot:68px;
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--t1);font-size:15px}
+
+/* ─ TOP NAV ─ */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:var(--nav);background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 14px;}
+.topbar-logo{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.9rem;box-shadow:0 2px 8px rgba(0,113,227,.3);}
+.topbar-info{flex:1;min-width:0}
+.topbar-info .uni{font-size:.65rem;color:var(--t2);font-weight:600;line-height:1.1}
+.topbar-info .dept{font-size:.82rem;font-weight:800;color:var(--t1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#liveTime{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;background:var(--bg);border:1px solid var(--bdr);padding:5px 9px;border-radius:8px;color:var(--t1);white-space:nowrap;flex-shrink:0;}
+.hbtn{width:36px;height:36px;border:none;background:transparent;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;border-radius:8px;transition:background .15s;}
+.hbtn:active{background:var(--bg)}
+.hbtn span{display:block;width:19px;height:2px;background:var(--t1);border-radius:2px;transition:all .28s cubic-bezier(.4,0,.2,1)}
+.hbtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hbtn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hbtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ─ DRAWER ─ */
+.overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.38);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s;}
+.overlay.show{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:-270px;bottom:0;z-index:850;width:250px;background:#fff;transition:right .3s cubic-bezier(.4,0,.2,1);padding-top:var(--nav);display:flex;flex-direction:column;box-shadow:-2px 0 30px rgba(0,0,0,.12);}
+.drawer.open{right:0}
+.duser{padding:14px 16px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.davatar{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem;}
+.dname{font-weight:800;font-size:.9rem;line-height:1.2}
+.drole{font-size:.7rem;color:var(--t2)}
+.dface-pill{display:flex;align-items:center;gap:7px;margin:8px 16px;padding:8px 12px;border-radius:10px;font-size:.75rem;font-weight:700;}
+.dface-pill.ok{background:rgba(48,199,94,.12);color:#1e7a3c}
+.dface-pill.warn{background:rgba(255,149,0,.12);color:#9a4e00}
+.dface-pill.info{background:rgba(0,113,227,.1);color:#0055aa}
+.ditem{display:flex;align-items:center;gap:10px;padding:12px 16px;border:none;background:transparent;cursor:pointer;font-weight:600;font-size:.85rem;color:var(--t1);width:100%;text-align:left;transition:background .12s;}
+.ditem:active{background:var(--bg)}
+.ditem.active{color:var(--blue);background:rgba(0,113,227,.07)}
+.ditem i{width:18px;color:var(--blue);font-size:.9rem}
+.ditem.red{color:var(--red)}
+.ditem.red i{color:var(--red)}
+.dsep{height:1px;background:var(--bdr);margin:6px 0}
+
+/* ─ BODY ─ */
+.body{padding-top:calc(var(--nav) + 12px);padding-bottom:calc(var(--bot) + 12px + var(--safe-bot));padding-left:14px;padding-right:14px;max-width:500px;margin:0 auto;}
+.tab{display:none}
+.tab.on{display:block}
+
+/* ─ WELCOME CARD ─ */
+.wcard{background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);border-radius:18px;padding:16px 18px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;}
+.wcard::after{content:'';position:absolute;right:-16px;top:-16px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07)}
+.wcard::before{content:'';position:absolute;right:30px;bottom:-22px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.05)}
+.wgreet{font-size:.68rem;opacity:.8;font-weight:500;margin-bottom:2px}
+.wname{font-size:1.25rem;font-weight:800;line-height:1.2;margin-bottom:10px}
+.wpills{display:flex;gap:7px;flex-wrap:wrap}
+.wpill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:20px;font-size:.68rem;font-weight:600;}
+.wpill.face-ok{background:rgba(48,199,94,.22);border-color:rgba(48,199,94,.38)}
+.wpill.face-warn{background:rgba(255,149,0,.22);border-color:rgba(255,149,0,.38);cursor:pointer}
+.wpill.face-neutral{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);cursor:default}
+
+/* ─ FACE ID STATUS CARD ─ */
+.face-status-card{
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+}
+.face-status-card.required-ok{background:linear-gradient(135deg,rgba(48,199,94,.15),rgba(48,199,94,.06));border:1.5px solid rgba(48,199,94,.3);}
+.face-status-card.required-missing{background:linear-gradient(135deg,rgba(255,59,48,.12),rgba(255,59,48,.05));border:1.5px solid rgba(255,59,48,.25);}
+.face-status-card.reg-allowed{background:linear-gradient(135deg,rgba(0,113,227,.12),rgba(0,113,227,.05));border:1.5px solid rgba(0,113,227,.25);cursor:pointer;}
+.face-status-card.reg-allowed:active{transform:scale(.98)}
+.face-status-card.no-face{background:#f5f5f7;border:1.5px solid var(--bdr);}
+.fsc-icon{font-size:1.6rem;flex-shrink:0}
+.fsc-body{flex:1;min-width:0}
+.fsc-title{font-size:.85rem;font-weight:800;line-height:1.3}
+.fsc-sub{font-size:.7rem;color:var(--t2);margin-top:2px}
+.fsc-chip{font-size:.62rem;font-weight:800;padding:4px 10px;border-radius:20px;flex-shrink:0;text-transform:uppercase;letter-spacing:.3px;}
+.fsc-chip.active{background:#1e7a3c;color:#fff}
+.fsc-chip.missing{background:var(--red);color:#fff}
+.fsc-chip.ready{background:var(--blue);color:#fff}
+.fsc-chip.off{background:var(--t3);color:#fff}
+
+/* ─ LOCATION BANNER ─ */
+.loc-banner{border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;}
+.loc-banner.at-office{background:linear-gradient(135deg,rgba(48,199,94,.15),rgba(48,199,94,.06));border:1.5px solid rgba(48,199,94,.3);}
+.loc-banner.not-office{background:linear-gradient(135deg,rgba(255,149,0,.15),rgba(255,149,0,.06));border:1.5px solid rgba(255,149,0,.3);}
+.loc-banner.checking{background:linear-gradient(135deg,rgba(0,113,227,.1),rgba(0,113,227,.04));border:1.5px solid rgba(0,113,227,.2);}
+.loc-banner:active{transform:scale(.98)}
+.loc-icon{font-size:1.4rem;flex-shrink:0}
+.loc-body{flex:1;min-width:0}
+.loc-title{font-size:.82rem;font-weight:800}
+.loc-sub{font-size:.68rem;color:var(--t2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.loc-chip{font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0;text-transform:uppercase;}
+.loc-chip.at{background:#1e7a3c;color:#fff}
+.loc-chip.out{background:var(--orange);color:#fff}
+.loc-chip.loading{background:var(--blue);color:#fff}
+
+/* ─ SECTION CARD ─ */
+.scard{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 10px rgba(0,0,0,.06);}
+.stitle{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.stitle i{color:var(--blue)}
+
+/* ─ STAT ROW ─ */
+.statrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stbox{background:var(--bg);border-radius:12px;padding:10px 12px;text-align:center}
+.stval{font-size:1.65rem;font-weight:800;color:var(--blue);font-family:'JetBrains Mono',monospace;line-height:1}
+.stlbl{font-size:.62rem;color:var(--t2);font-weight:600;margin-top:3px}
+
+/* ─ PROGRESS ─ */
+.prog-wrap{margin:10px 0}
+.prog-labels{display:flex;justify-content:space-between;font-size:.68rem;font-weight:600;margin-bottom:4px;color:var(--t2)}
+.prog-track{height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.pf-blue{background:var(--blue)} .pf-green{background:var(--green)} .pf-orange{background:var(--orange)}
+
+/* ─ TIME ROW ─ */
+.timerow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tbox{background:var(--bg);border-radius:12px;padding:10px 11px}
+.tbox .tlbl{font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--t2);margin-bottom:3px}
+.tbox .tval{font-size:.95rem;font-weight:800;font-family:'JetBrains Mono',monospace}
+.tbox .taddr{font-size:.62rem;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbox.tlogin .tval{color:var(--green)}
+.tbox.tlogout .tval{color:var(--red)}
+
+/* ─ BUTTONS ─ */
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.abtn{padding:13px 10px;border:none;border-radius:12px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;font-family:'Plus Jakarta Sans',sans-serif;}
+.abtn:active:not(:disabled){transform:scale(.96)}
+.abtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(48,199,94,.35)}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 3px 12px rgba(255,59,48,.35)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 3px 12px rgba(0,113,227,.3)}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 3px 12px rgba(255,149,0,.3)}
+.btn-full{grid-column:1/-1}
+.leavebtn{width:100%;margin-top:10px;padding:12px;border:none;border-radius:12px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;background:rgba(255,149,0,.1);color:var(--orange);display:flex;align-items:center;justify-content:center;gap:7px;transition:background .12s;}
+.leavebtn:active{background:rgba(255,149,0,.18)}
+
+/* ─ SHIFT DIVIDER ─ */
+.sdiv{font-size:.72rem;font-weight:700;color:var(--t2);margin:14px 0 10px;display:flex;align-items:center;gap:8px;}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.spill{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;padding:3px 8px;border-radius:20px;}
+.sp-ok{background:rgba(48,199,94,.15);color:var(--green)}
+.sp-active{background:rgba(0,113,227,.15);color:var(--blue)}
+.sp-pending{background:var(--bg);color:var(--t3)}
+
+/* ─ HISTORY ITEMS ─ */
+.histlist{display:flex;flex-direction:column;gap:7px}
+.hitem{background:var(--card);border-radius:13px;padding:11px 13px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.hdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.hbody{flex:1;min-width:0}
+.hdate{font-size:.75rem;font-weight:700}
+.htimes{font-size:.67rem;color:var(--t2);font-family:'JetBrains Mono',monospace}
+.hhrs{font-size:.8rem;font-weight:800;color:var(--blue);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.hbadge{font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:5px;margin-left:4px;}
+.hb-office{background:rgba(48,199,94,.15);color:#1e7a3c}
+.hb-remote{background:rgba(124,58,237,.15);color:var(--purple)}
+
+/* ─ STATS GRID ─ */
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sgcell{background:var(--card);border-radius:14px;padding:12px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.sgv{font-size:1.6rem;font-weight:800;color:var(--blue);font-family:'JetBrains Mono',monospace}
+.sgl{font-size:.62rem;color:var(--t2);font-weight:600;margin-top:2px}
+
+/* ─ DATE RANGE ─ */
+.drange{background:var(--card);border-radius:16px;padding:13px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.drange-row{display:flex;gap:8px;align-items:flex-end}
+.df{flex:1}
+.df label{font-size:.68rem;font-weight:700;color:var(--t2);display:block;margin-bottom:4px}
+.df input{width:100%;padding:9px 11px;border:1px solid var(--bdr);border-radius:9px;font-size:.8rem;background:var(--bg);color:var(--t1);font-family:'Plus Jakarta Sans',sans-serif}
+.df input:focus{outline:none;border-color:var(--blue);background:#fff}
+.drbtn{padding:9px 14px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.82rem}
+
+/* ─ CALENDAR ─ */
+.calcard{background:var(--card);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.calmon{font-weight:800;font-size:.95rem}
+.calnav{display:flex;gap:5px}
+.calnav button{width:30px;height:30px;border:1px solid var(--bdr);background:var(--bg);border-radius:7px;cursor:pointer;font-size:.8rem;color:var(--t2);display:flex;align-items:center;justify-content:center}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cdh{text-align:center;font-size:.58rem;font-weight:700;color:var(--t3);padding:3px 0}
+.cday{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;cursor:pointer;background:var(--bg);transition:background .12s;position:relative;}
+.cday:active{transform:scale(.9)}
+.cday.today{background:rgba(0,113,227,.14);color:var(--blue);font-weight:800}
+.cday.present{background:rgba(48,199,94,.18);color:#1e7a3c}
+.cday.holiday{background:var(--orange);color:#fff}
+.cday.leave{background:rgba(255,149,0,.15);color:var(--orange)}
+.cday.other{opacity:.3}
+.cdot{width:3px;height:3px;border-radius:50%;background:currentColor;margin-top:1px}
+.calleg{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:.67rem;font-weight:600;color:var(--t2)}
+.calleg span{display:inline-block;width:9px;height:9px;border-radius:3px;vertical-align:middle;margin-right:2px}
+.slbl{font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2);margin:14px 0 7px}
+
+/* ─ HOLIDAY ITEMS ─ */
+.holitem{background:var(--card);border-radius:12px;padding:11px 13px;margin-bottom:7px;border-left:3px solid var(--blue);box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.holname{font-weight:700;font-size:.82rem;margin-bottom:2px}
+.holmeta{font-size:.67rem;color:var(--t2);display:flex;align-items:center;gap:7px}
+.holbadge{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--blue);color:#fff;text-transform:uppercase}
+
+/* ─ BOTTOM NAV ─ */
+.botnav{position:fixed;bottom:0;left:0;right:0;z-index:700;height:var(--bot);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--bdr);display:flex;align-items:stretch;padding-bottom:var(--safe-bot);}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:transparent;font-size:.58rem;font-weight:600;color:var(--t3);transition:color .15s;padding-bottom:4px;}
+.bnav i{font-size:1.25rem;transition:transform .15s}
+.bnav.on{color:var(--blue)}
+.bnav.on i{transform:scale(1.1)}
+
+/* ─ FACE SHEET ─ */
+.backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s ease;}
+.backdrop.show{opacity:1;pointer-events:all}
+.sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:500px;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.backdrop.show .sheet{transform:translateY(0)}
+.shandle{width:34px;height:4px;background:var(--bdr);border-radius:2px;margin:9px auto 14px}
+.shtitle{font-size:.95rem;font-weight:800;text-align:center;padding:0 18px;margin-bottom:3px}
+.shsub{font-size:.75rem;color:var(--t2);text-align:center;padding:0 18px;margin-bottom:14px}
+
+/* Camera */
+.camwrap{position:relative;background:#000;aspect-ratio:4/3;overflow:hidden}
+#fv{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+#fc{display:none}
+.camovl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.camoval{width:46%;aspect-ratio:3/4;border:2.5px solid rgba(48,199,94,.85);border-radius:50%;box-shadow:0 0 0 2000px rgba(0,0,0,.42),0 0 24px rgba(48,199,94,.18);animation:opulse 2.2s ease-in-out infinite;}
+@keyframes opulse{0%,100%{border-color:rgba(48,199,94,.85)}50%{border-color:rgba(0,200,255,.9);box-shadow:0 0 0 2000px rgba(0,0,0,.42),0 0 32px rgba(0,200,255,.22)}}
+.camtxt{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0,rgba(0,0,0,.65),transparent);padding:18px 14px 10px;color:#fff;font-size:.75rem;font-weight:600;text-align:center;}
+
+/* 5-photo progress dots */
+.photo-progress{display:flex;justify-content:center;gap:8px;padding:12px 16px 0;}
+.pp-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--bdr);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--t3);transition:all .25s;}
+.pp-dot.captured{background:rgba(48,199,94,.2);border-color:var(--green);color:#1e7a3c}
+.pp-dot.active{border-color:var(--blue);color:var(--blue);animation:ppulse .9s ease-in-out infinite}
+@keyframes ppulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.pp-label{text-align:center;font-size:.72rem;font-weight:600;color:var(--t2);margin-top:6px;padding:0 16px;}
+
+/* Face result banner */
+.fresult{margin:12px 16px 0;padding:14px;border-radius:14px;text-align:center;display:none}
+.fresult.ok{background:rgba(48,199,94,.12);border:1px solid rgba(48,199,94,.25)}
+.fresult.err{background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.2)}
+.fricon{font-size:1.8rem;margin-bottom:5px}
+.frmsg{font-weight:700;font-size:.85rem}
+.frsub{font-size:.7rem;color:var(--t2);margin-top:3px}
+
+/* Face ready banner */
+.face-ready-banner{margin:0 16px;padding:13px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(48,199,94,.18),rgba(48,199,94,.08));border:1.5px solid rgba(48,199,94,.4);display:none;align-items:center;gap:10px;}
+.face-ready-banner.show{display:flex}
+.frb-icon{font-size:1.4rem;flex-shrink:0}
+.frb-text .frb-title{font-size:.85rem;font-weight:800;color:#1e7a3c}
+.frb-text .frb-sub{font-size:.7rem;color:var(--t2);margin-top:2px}
+
+/* Security notice */
+.secnote{margin:0 16px 0;padding:9px 12px;background:rgba(0,113,227,.07);border-radius:10px;border-left:3px solid var(--blue);font-size:.68rem;color:#1a5276;font-weight:500;display:flex;gap:7px;}
+.secnote i{color:var(--blue);flex-shrink:0;margin-top:1px}
+
+/* Sheet buttons */
+.shbtns{padding:12px 16px calc(28px + var(--safe-bot));display:flex;flex-direction:column;gap:8px}
+.shbtn{width:100%;padding:14px;border:none;border-radius:14px;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .12s;font-family:'Plus Jakarta Sans',sans-serif;}
+.shbtn:active:not(:disabled){transform:scale(.97)}
+.shbtn:disabled{opacity:.4;cursor:not-allowed}
+.shbtn-blue{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(0,113,227,.3)}
+.shbtn-green{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(48,199,94,.3)}
+.shbtn-ghost{background:var(--bg);color:var(--t2)}
+
+/* Leave sheet */
+.lsheet{padding:16px 16px calc(24px + var(--safe-bot))}
+.frow{margin-bottom:12px}
+.frow label{font-size:.7rem;font-weight:700;color:var(--t2);display:block;margin-bottom:4px}
+.frow input,.frow select,.frow textarea{width:100%;padding:11px 12px;border:1px solid var(--bdr);border-radius:10px;font-size:.85rem;background:var(--bg);color:var(--t1);font-family:'Plus Jakarta Sans',sans-serif;}
+.frow input:focus,.frow select:focus,.frow textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+
+/* Confirm sheet */
+.csheet{padding:16px 16px calc(24px + var(--safe-bot))}
+.cmsg{font-size:.85rem;color:var(--t2);line-height:1.55;margin-bottom:18px}
+
+/* Toast */
+.toast{position:fixed;top:calc(var(--nav) + 9px);left:13px;right:13px;z-index:2000;background:#1d1d1f;color:#fff;border-radius:13px;padding:12px 15px;display:flex;align-items:center;gap:9px;box-shadow:0 6px 22px rgba(0,0,0,.22);font-size:.8rem;font-weight:600;transform:translateY(-14px);opacity:0;transition:all .28s ease;pointer-events:none;max-width:500px;margin:0 auto;}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.tok{background:#1e7a3c}
+.toast.terr{background:#bf3127}
+.toast.twarn{background:#8a4e00}
+.toast i{font-size:.9rem;flex-shrink:0}
+
+/* Spin */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+
+/* Empty */
+.empty{text-align:center;padding:28px 16px;color:var(--t3)}
+.empty i{font-size:2rem;margin-bottom:8px;display:block}
+.empty p{font-size:.8rem;font-weight:600}
+
+@media(min-width:540px){
+  .body{padding-left:20px;padding-right:20px}
+  .statrow,.stgrid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
 </head>
 <body>
-    <!-- Navigation Bar - Rounded with JAIN Logo -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <div class="university-logo">J</div>
-            <div class="brand-text">
-                <div class="university-name">JAIN UNIVERSITY</div>
-                <div class="office-name">Office of <span>Academics</span></div>
-            </div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">J</div>
+  <div class="topbar-info">
+    <div class="uni">JAIN UNIVERSITY</div>
+    <div class="dept">Office of Academics</div>
+  </div>
+  <div id="liveTime">--:--:--</div>
+  <button class="hbtn" id="hbtn" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- OVERLAY + DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="duser">
+    <div class="davatar" id="davatar">?</div>
+    <div>
+      <div class="dname" id="dname">Loading…</div>
+      <div class="drole">Intern · JAIN University</div>
+    </div>
+  </div>
+  <!-- Face pill — content set dynamically by updateFaceBadge() -->
+  <div class="dface-pill info" id="dfacepill">
+    <i class="fas fa-circle-notch fa-spin"></i> <span>Checking…</span>
+  </div>
+  <div class="dsep"></div>
+  <button class="ditem active" id="di-normal"   onclick="goTab('normal');closeDrawer()"><i class="fas fa-clock"></i> Normal Attendance</button>
+  <button class="ditem"        id="di-shift"    onclick="goTab('shift');closeDrawer()"><i class="fas fa-layer-group"></i> Shift Attendance</button>
+  <button class="ditem"        id="di-stats"    onclick="goTab('stats');closeDrawer()"><i class="fas fa-chart-bar"></i> Statistics</button>
+  <button class="ditem"        id="di-calendar" onclick="goTab('calendar');closeDrawer()"><i class="fas fa-calendar-alt"></i> Calendar</button>
+  <div class="dsep"></div>
+  <button class="ditem" onclick="openLeave();closeDrawer()"><i class="fas fa-calendar-times"></i> Apply Leave</button>
+  <!-- Register Face — only shown when admin enables it -->
+  <button class="ditem" id="di-face-reg" style="display:none" onclick="openFaceRegIfAllowed();closeDrawer()">
+    <i class="fas fa-camera"></i> Register Face (5 Photos)
+  </button>
+  <div class="dsep"></div>
+  <button class="ditem red" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
+
+<!-- PAGE BODY -->
+<div class="body">
+  <div id="toast" class="toast"><i class="fas fa-check-circle"></i><span id="toastTxt"></span></div>
+
+  <!-- ══ NORMAL TAB ══ -->
+  <div id="tab-normal" class="tab on">
+
+    <!-- Welcome card -->
+    <div class="wcard">
+      <div class="wgreet" id="wgreet">Good morning,</div>
+      <div class="wname" id="wname">Loading…</div>
+      <div class="wpills">
+        <div class="wpill"><i class="fas fa-map-marker-alt"></i> JAIN HQ, Bengaluru</div>
+        <div class="wpill face-neutral" id="wfacebadge">
+          <i class="fas fa-spinner spin"></i> <span id="wfacetext">Checking…</span>
         </div>
-        
-        <div class="navbar-tabs">
-            <button class="nav-tab active" onclick="switchTab('normal')">
-                <i class="fas fa-clock"></i> Normal
-            </button>
-            <button class="nav-tab" onclick="switchTab('shift')">
-                <i class="fas fa-calendar-alt"></i> Shift
-            </button>
-            <button class="nav-tab" onclick="switchTab('statistics')">
-                <i class="fas fa-chart-bar"></i> Stats
-            </button>
-            <button class="nav-tab" onclick="switchTab('calendar')">
-                <i class="fas fa-calendar"></i> Calendar
-            </button>
-        </div>
-        
-        <div class="navbar-menu">
-            <div class="time-display" id="currentTime"></div>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </nav>
-
-    <div class="dashboard-container">
-        <div id="alertContainer"></div>
-
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1 class="welcome-title">Welcome back, <span id="username">Loading...</span>!</h1>
-            <p class="welcome-subtitle" id="welcomeMessage"></p>
-            <span class="office-badge">
-                <i class="fas fa-map-marker-alt"></i> JAIN University Head Office, Bengaluru
-            </span>
-        </div>
-
-        <!-- NORMAL LOGIN TAB -->
-        <div id="normal-tab" class="tab-content active">
-            <div class="two-column">
-                <!-- Left Column - Attendance -->
-                <div class="left-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-clock"></i></div>
-                            <h2>Normal Attendance</h2>
-                        </div>
-
-                        <!-- Today's Progress -->
-                        <div class="shift-progress">
-                            <div class="shift-card">
-                                <div class="shift-header">
-                                    <span class="shift-name">Today's Progress</span>
-                                    <span class="shift-hours" id="normalTodayHours">0.0</span>
-                                </div>
-                                <div class="shift-target">Target: <span id="normalTarget">8.0</span> hours</div>
-                            </div>
-                            <div class="shift-card">
-                                <div class="shift-header">
-                                    <span class="shift-name">Current Session</span>
-                                    <span class="shift-hours" id="normalCurrentHours">0.0</span>
-                                </div>
-                                <div class="shift-target" id="normalSessionInfo">No active session</div>
-                            </div>
-                        </div>
-
-                        <!-- Login/Logout Times Panel -->
-                        <div class="time-panel">
-                            <div class="time-block login">
-                                <div class="label">Last Login</div>
-                                <div class="time" id="normalLoginTime">--:--</div>
-                                <div class="address" id="normalLoginAddress"></div>
-                            </div>
-                            <div class="time-block logout">
-                                <div class="label">Last Logout</div>
-                                <div class="time" id="normalLogoutTime">--:--</div>
-                                <div class="address" id="normalLogoutAddress"></div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="action-grid">
-                            <button id="normalLoginBtn" class="btn btn-login" onclick="handleNormalLogin()">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </button>
-                            <button id="normalLogoutBtn" class="btn btn-logout" onclick="handleNormalLogout()" disabled>
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </button>
-                        </div>
-
-                        <button class="btn btn-leave" onclick="openLeaveModal()">
-                            <i class="fas fa-calendar-times"></i> Apply for Leave
-                        </button>
-                    </div>
-
-                    <!-- Recent History -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-history"></i></div>
-                            <h2>Recent Normal Logins</h2>
-                        </div>
-                        <div class="table-container" id="normalHistory">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column - Calendar & Holidays -->
-                <div class="right-column">
-                    <!-- Calendar Card -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                            <h2>Attendance Calendar</h2>
-                        </div>
-                        
-                        <div class="calendar-header">
-                            <div class="calendar-month" id="normalCalendarMonth"></div>
-                            <div class="calendar-nav">
-                                <button class="calendar-nav-btn" onclick="changeMonth(-1, 'normal')">◀</button>
-                                <button class="calendar-nav-btn" onclick="changeMonth(1, 'normal')">▶</button>
-                            </div>
-                        </div>
-                        
-                        <div class="calendar-grid" id="normalCalendarGrid"></div>
-
-                        <div style="display: flex; gap: 20px; margin-top: 24px; padding: 16px; background: #f5f5f7; border-radius: 20px; flex-wrap: wrap;">
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #d1f4e0; border-radius: 8px;"></span> Present</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #ff9500; border-radius: 8px;"></span> Holiday</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #fff3cd; border-radius: 8px;"></span> Leave</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: white; border: 2px solid #0071e3; border-radius: 8px;"></span> Today</div>
-                        </div>
-                    </div>
-
-                    <!-- Holidays This Week -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-gift"></i></div>
-                            <h2>Holidays This Week</h2>
-                        </div>
-                        <div class="count-badge" id="weeklyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="weeklyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-
-                    <!-- Holidays This Month -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                            <h2>Holidays This Month</h2>
-                        </div>
-                        <div class="count-badge" id="monthlyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="monthlyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SHIFT LOGIN TAB -->
-        <div id="shift-tab" class="tab-content">
-            <div class="two-column">
-                <!-- Left Column - Shift Attendance -->
-                <div class="left-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                            <h2>Shift Attendance</h2>
-                        </div>
-
-                        <!-- Shift Progress -->
-                        <div class="shift-progress">
-                            <div class="shift-card" id="shift1Card">
-                                <div class="shift-header">
-                                    <span class="shift-name">Shift 1</span>
-                                    <span class="shift-hours" id="shift1Hours">0.0</span>
-                                </div>
-                                <div class="shift-target">Target: <span id="shift1Target">4.0</span> hrs</div>
-                            </div>
-                            <div class="shift-card" id="shift2Card">
-                                <div class="shift-header">
-                                    <span class="shift-name">Shift 2</span>
-                                    <span class="shift-hours" id="shift2Hours">0.0</span>
-                                </div>
-                                <div class="shift-target">Target: <span id="shift2Target">4.0</span> hrs</div>
-                            </div>
-                        </div>
-
-                        <!-- Today's Total -->
-                        <div style="background: #e8f4fd; border-radius: 30px; padding: 20px; margin-bottom: 24px; text-align: center;">
-                            <div style="font-size: 0.9rem; color: #86868b;">Total Today</div>
-                            <div style="font-size: 2.5rem; font-weight: 800; color: #0071e3;" id="shiftTotalToday">0.0</div>
-                            <div style="font-size: 1rem; color: #86868b;">out of <span id="shiftTotalTarget">8.0</span> hours</div>
-                        </div>
-
-                        <!-- Shift 1 Section -->
-                        <h3 style="margin-bottom: 16px; font-size: 1.2rem;">Shift 1</h3>
-                        <div class="time-panel" style="margin-bottom: 20px;">
-                            <div class="time-block login">
-                                <div class="label">Login</div>
-                                <div class="time" id="shift1LoginTime">--:--</div>
-                                <div class="address" id="shift1LoginAddress"></div>
-                            </div>
-                            <div class="time-block logout">
-                                <div class="label">Logout</div>
-                                <div class="time" id="shift1LogoutTime">--:--</div>
-                                <div class="address" id="shift1LogoutAddress"></div>
-                            </div>
-                        </div>
-                        <div class="action-grid" style="margin-bottom: 32px;">
-                            <button id="shift1LoginBtn" class="btn btn-shift1" onclick="startShift('shift1')">
-                                <i class="fas fa-play"></i> Start Shift 1
-                            </button>
-                            <button id="shift1LogoutBtn" class="btn btn-logout" onclick="endShift('shift1')" disabled>
-                                <i class="fas fa-stop"></i> End Shift 1
-                            </button>
-                        </div>
-
-                        <!-- Shift 2 Section -->
-                        <h3 style="margin-bottom: 16px; font-size: 1.2rem;">Shift 2</h3>
-                        <div class="time-panel" style="margin-bottom: 20px;">
-                            <div class="time-block login">
-                                <div class="label">Login</div>
-                                <div class="time" id="shift2LoginTime">--:--</div>
-                                <div class="address" id="shift2LoginAddress"></div>
-                            </div>
-                            <div class="time-block logout">
-                                <div class="label">Logout</div>
-                                <div class="time" id="shift2LogoutTime">--:--</div>
-                                <div class="address" id="shift2LogoutAddress"></div>
-                            </div>
-                        </div>
-                        <div class="action-grid">
-                            <button id="shift2LoginBtn" class="btn btn-shift2" onclick="startShift('shift2')">
-                                <i class="fas fa-play"></i> Start Shift 2
-                            </button>
-                            <button id="shift2LogoutBtn" class="btn btn-logout" onclick="endShift('shift2')" disabled>
-                                <i class="fas fa-stop"></i> End Shift 2
-                            </button>
-                        </div>
-
-                        <button class="btn btn-leave" style="margin-top: 24px;" onclick="openLeaveModal()">
-                            <i class="fas fa-calendar-times"></i> Apply for Leave
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Right Column - Calendar & Holidays (Same as normal tab) -->
-                <div class="right-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                            <h2>Attendance Calendar</h2>
-                        </div>
-                        
-                        <div class="calendar-header">
-                            <div class="calendar-month" id="shiftCalendarMonth"></div>
-                            <div class="calendar-nav">
-                                <button class="calendar-nav-btn" onclick="changeMonth(-1, 'shift')">◀</button>
-                                <button class="calendar-nav-btn" onclick="changeMonth(1, 'shift')">▶</button>
-                            </div>
-                        </div>
-                        
-                        <div class="calendar-grid" id="shiftCalendarGrid"></div>
-
-                        <div style="display: flex; gap: 20px; margin-top: 24px; padding: 16px; background: #f5f5f7; border-radius: 20px; flex-wrap: wrap;">
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #d1f4e0; border-radius: 8px;"></span> Present</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #ff9500; border-radius: 8px;"></span> Holiday</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #fff3cd; border-radius: 8px;"></span> Leave</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: white; border: 2px solid #0071e3; border-radius: 8px;"></span> Today</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-gift"></i></div>
-                            <h2>Holidays This Week</h2>
-                        </div>
-                        <div class="count-badge" id="shiftWeeklyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="shiftWeeklyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                            <h2>Holidays This Month</h2>
-                        </div>
-                        <div class="count-badge" id="shiftMonthlyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="shiftMonthlyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- STATISTICS TAB -->
-        <div id="statistics-tab" class="tab-content">
-            <div class="two-column">
-                <!-- Left Column - Statistics Controls and Results -->
-                <div class="left-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-                            <h2>Attendance Statistics</h2>
-                        </div>
-
-                        <!-- Date Range Picker -->
-                        <div style="display: flex; gap: 16px; margin-bottom: 32px; background: #f5f5f7; padding: 24px; border-radius: 30px;">
-                            <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">From</label>
-                                <input type="date" id="statsStartDate" style="width: 100%; padding: 14px; border: 1px solid #e5e5e7; border-radius: 30px;">
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">To</label>
-                                <input type="date" id="statsEndDate" style="width: 100%; padding: 14px; border: 1px solid #e5e5e7; border-radius: 30px;">
-                            </div>
-                            <button class="btn" style="background: #0071e3; color: white; padding: 14px 32px; width: auto; border-radius: 40px;" onclick="loadStatistics()">
-                                <i class="fas fa-search"></i> Get Stats
-                            </button>
-                        </div>
-
-                        <!-- Statistics Results -->
-                        <div id="statisticsResults" style="display: none;">
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
-                                <div style="background: linear-gradient(135deg, #f5f5f7, #e8e8ed); border-radius: 20px; padding: 24px; text-align: center;">
-                                    <div style="font-size: 2.5rem; font-weight: 800; color: #0071e3;" id="statTotalDays">0</div>
-                                    <div style="font-size: 0.9rem; color: #86868b;">Working Days</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #f5f5f7, #e8e8ed); border-radius: 20px; padding: 24px; text-align: center;">
-                                    <div style="font-size: 2.5rem; font-weight: 800; color: #0071e3;" id="statTotalHours">0</div>
-                                    <div style="font-size: 0.9rem; color: #86868b;">Total Hours</div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #f5f5f7, #e8e8ed); border-radius: 20px; padding: 24px; text-align: center;">
-                                    <div style="font-size: 2.5rem; font-weight: 800; color: #0071e3;" id="statAvgHours">0</div>
-                                    <div style="font-size: 0.9rem; color: #86868b;">Avg Hours/Day</div>
-                                </div>
-                            </div>
-
-                            <div style="background: #f5f5f7; border-radius: 20px; padding: 24px;">
-                                <h3 style="margin-bottom: 20px;">Shift Breakdown</h3>
-                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                    <div>
-                                        <div style="font-size: 0.8rem; color: #86868b;">Shift 1</div>
-                                        <div style="font-size: 1.8rem; font-weight: 800; color: #0071e3;" id="statShift1">0</div>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 0.8rem; color: #86868b;">Shift 2</div>
-                                        <div style="font-size: 1.8rem; font-weight: 800; color: #0071e3;" id="statShift2">0</div>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 0.8rem; color: #86868b;">Normal</div>
-                                        <div style="font-size: 1.8rem; font-weight: 800; color: #0071e3;" id="statNormal">0</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 24px;">
-                                <h3 style="margin-bottom: 16px;">Daily Breakdown</h3>
-                                <div class="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Type</th>
-                                                <th>Shift</th>
-                                                <th>Login</th>
-                                                <th>Logout</th>
-                                                <th>Hours</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="statisticsTableBody">
-                                            <tr><td colspan="6" style="text-align: center;">Select date range to view data</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column - Summary Cards -->
-                <div class="right-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                            <h2>Early Logouts</h2>
-                        </div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #ff9500; text-align: center;" id="statEarlyLogouts">0</div>
-                        <div style="text-align: center; color: #86868b;">in selected period</div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-times"></i></div>
-                            <h2>Leaves Taken</h2>
-                        </div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #34c759; text-align: center;" id="statLeaves">0</div>
-                        <div style="text-align: center; color: #86868b;">in selected period</div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-session"></i></div>
-                            <h2>Total Sessions</h2>
-                        </div>
-                        <div style="font-size: 3rem; font-weight: 800; color: #0071e3; text-align: center;" id="statSessions">0</div>
-                        <div style="text-align: center; color: #86868b;">in selected period</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CALENDAR TAB -->
-        <div id="calendar-tab" class="tab-content">
-            <div class="two-column">
-                <!-- Left Column - Full Calendar -->
-                <div class="left-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar"></i></div>
-                            <h2>Full Calendar View</h2>
-                        </div>
-
-                        <div class="calendar-header">
-                            <div class="calendar-month" id="fullCalendarMonth"></div>
-                            <div class="calendar-nav">
-                                <button class="calendar-nav-btn" onclick="changeMonth(-1, 'full')">◀</button>
-                                <button class="calendar-nav-btn" onclick="changeMonth(1, 'full')">▶</button>
-                            </div>
-                        </div>
-                        
-                        <div class="calendar-grid" id="fullCalendarGrid"></div>
-
-                        <div style="display: flex; gap: 20px; margin-top: 24px; padding: 16px; background: #f5f5f7; border-radius: 20px; flex-wrap: wrap;">
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #d1f4e0; border-radius: 8px;"></span> Present</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #ff9500; border-radius: 8px;"></span> Holiday</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: #fff3cd; border-radius: 8px;"></span> Leave</div>
-                            <div><span style="display: inline-block; width: 16px; height: 16px; background: white; border: 2px solid #0071e3; border-radius: 8px;"></span> Today</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column - Holiday Info -->
-                <div class="right-column">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-gift"></i></div>
-                            <h2>Holidays This Week</h2>
-                        </div>
-                        <div class="count-badge" id="fullWeeklyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="fullWeeklyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                            <h2>Holidays This Month</h2>
-                        </div>
-                        <div class="count-badge" id="fullMonthlyHolidayCount">0 Holidays</div>
-                        <div class="holiday-list" id="fullMonthlyHolidays">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading holidays...</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
-                            <h2>Your Leaves</h2>
-                        </div>
-                        <div class="holiday-list" id="userLeavesList">
-                            <div style="text-align: center; padding: 40px; color: #86868b;">Loading leaves...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirm Action</h3>
-                <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
-            </div>
-            <div id="confirmMessage" style="margin-bottom: 24px;"></div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn" id="confirmYesBtn" style="background: #ff3b30; color: white; flex: 1; border-radius: 40px;">Yes</button>
-                <button class="btn" onclick="closeConfirmModal()" style="background: #f5f5f7; flex: 1; border-radius: 40px;">Cancel</button>
-            </div>
-        </div>
+    <!-- Face ID Status Card (admin-driven) -->
+    <div class="face-status-card no-face" id="faceStatusCard" onclick="handleFaceCardTap()">
+      <div class="fsc-icon" id="fscIcon">🔓</div>
+      <div class="fsc-body">
+        <div class="fsc-title" id="fscTitle">Face ID not required</div>
+        <div class="fsc-sub" id="fscSub">Login directly — no face scan needed</div>
+      </div>
+      <div class="fsc-chip off" id="fscChip">Off</div>
     </div>
 
-    <!-- Leave Modal -->
-    <div id="leaveModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Apply for Leave</h3>
-                <button class="modal-close" onclick="closeLeaveModal()">&times;</button>
-            </div>
-            <form id="leaveForm" onsubmit="submitLeave(event)">
-                <div class="form-group">
-                    <label>Leave Date</label>
-                    <input type="date" id="leaveDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Leave Type</label>
-                    <select id="leaveType" required>
-                        <option value="">Select type</option>
-                        <option value="Sick Leave">Sick Leave</option>
-                        <option value="Casual Leave">Casual Leave</option>
-                        <option value="Personal Leave">Personal Leave</option>
-                        <option value="Emergency">Emergency</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Reason</label>
-                    <textarea id="leaveComments" rows="3" placeholder="Please provide a reason..."></textarea>
-                </div>
-                <button type="submit" class="btn" style="background: #0071e3; color: white; width: 100%; border-radius: 40px;">
-                    Submit Application
-                </button>
-            </form>
-        </div>
+    <!-- Location banner -->
+    <div class="loc-banner checking" id="locBanner" onclick="refreshLocation()">
+      <div class="loc-icon" id="locIcon">📡</div>
+      <div class="loc-body">
+        <div class="loc-title" id="locTitle">Detecting location…</div>
+        <div class="loc-sub"  id="locSub">Tap to refresh GPS</div>
+      </div>
+      <div class="loc-chip loading" id="locChip">Checking</div>
     </div>
 
-    <script>
-        let dashboardData = null;
-        let currentMonth = {
-            normal: new Date(),
-            shift: new Date(),
-            full: new Date()
-        };
-        let attendanceData = {};
-        let leaveData = {};
-        let holidayData = {};
-        let currentLocation = null;
-        let activeSession = null;
+    <!-- Attendance card -->
+    <div class="scard">
+      <div class="stitle"><i class="fas fa-clock"></i> Normal Login · Today</div>
+      <div class="statrow">
+        <div class="stbox"><div class="stval" id="nHoursToday">0.0</div><div class="stlbl">Hours Today</div></div>
+        <div class="stbox"><div class="stval" id="nHoursSess">0.0</div><div class="stlbl">This Session</div></div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-labels"><span id="nSessStatus">No active session</span><span id="nTarget">/ 8h</span></div>
+        <div class="prog-track"><div class="prog-fill pf-blue" id="nProgBar" style="width:0%"></div></div>
+      </div>
+      <div class="timerow">
+        <div class="tbox tlogin"><div class="tlbl">Login</div><div class="tval" id="nLoginTime">--:--</div><div class="taddr" id="nLoginAddr">—</div></div>
+        <div class="tbox tlogout"><div class="tlbl">Logout</div><div class="tval" id="nLogoutTime">--:--</div><div class="taddr" id="nLogoutAddr">—</div></div>
+      </div>
+      <div class="btnrow">
+        <button class="abtn btn-green" id="btnNLogin"  onclick="doNLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <button class="abtn btn-red"   id="btnNLogout" onclick="doNLogout()" disabled><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+      <button class="leavebtn" onclick="openLeave()"><i class="fas fa-calendar-times"></i> Apply for Leave</button>
+    </div>
 
-        // Tab switching
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tab + '-tab').classList.add('active');
-            
-            if (tab === 'calendar' || tab === 'normal' || tab === 'shift') {
-                renderAllCalendars();
-                loadAllHolidays();
-            }
+    <div class="slbl">Recent Logins</div>
+    <div id="nHistory" class="histlist"><div class="empty"><i class="fas fa-history"></i><p>Loading…</p></div></div>
+  </div>
+
+  <!-- ══ SHIFT TAB ══ -->
+  <div id="tab-shift" class="tab">
+    <div class="wcard" style="background:linear-gradient(135deg,#1d1d1f,#2c2c2e)">
+      <div class="wgreet">Shift Attendance</div>
+      <div class="wname" style="font-size:1rem">Track Shift 1 &amp; Shift 2 separately</div>
+      <div class="wpills">
+        <div class="wpill">Total: <span id="sTotalDisp">0.0</span> / <span id="sTargetDisp">8.0</span>h</div>
+      </div>
+    </div>
+
+    <!-- Compact face/loc row for shift tab -->
+    <div class="face-status-card no-face" id="faceStatusCardS" style="margin-bottom:8px;">
+      <div class="fsc-icon" id="fscIconS">🔓</div>
+      <div class="fsc-body">
+        <div class="fsc-title" id="fscTitleS">Face ID not required</div>
+        <div class="fsc-sub"   id="fscSubS">Login directly</div>
+      </div>
+      <div class="fsc-chip off" id="fscChipS">Off</div>
+    </div>
+
+    <div class="loc-banner checking" id="locBannerS" onclick="refreshLocation()" style="margin-bottom:10px;">
+      <div class="loc-icon" id="locIconS">📡</div>
+      <div class="loc-body">
+        <div class="loc-title" id="locTitleS">Detecting…</div>
+        <div class="loc-sub"   id="locSubS">Tap to refresh</div>
+      </div>
+      <div class="loc-chip loading" id="locChipS">Checking</div>
+    </div>
+
+    <div class="scard">
+      <div class="stitle"><i class="fas fa-layer-group"></i> Today's Shifts</div>
+
+      <div class="sdiv">Shift 1 <span class="spill sp-pending" id="s1pill">● Pending</span></div>
+      <div class="prog-wrap">
+        <div class="prog-labels"><span id="s1hl">0.0h worked</span><span id="s1tl">/ 4.0h</span></div>
+        <div class="prog-track"><div class="prog-fill pf-green" id="s1bar" style="width:0%"></div></div>
+      </div>
+      <div class="timerow" style="margin-bottom:10px">
+        <div class="tbox tlogin"><div class="tlbl">Login</div><div class="tval" id="s1lt">--:--</div><div class="taddr" id="s1la">—</div></div>
+        <div class="tbox tlogout"><div class="tlbl">Logout</div><div class="tval" id="s1ot">--:--</div><div class="taddr" id="s1oa">—</div></div>
+      </div>
+      <div class="btnrow" style="margin-bottom:14px">
+        <button class="abtn btn-blue"   id="btnS1L" onclick="doShiftLogin('shift1')"><i class="fas fa-play"></i> Start S1</button>
+        <button class="abtn btn-red"    id="btnS1O" onclick="doShiftLogout('shift1')" disabled><i class="fas fa-stop"></i> End S1</button>
+      </div>
+
+      <div class="sdiv">Shift 2 <span class="spill sp-pending" id="s2pill">● Pending</span></div>
+      <div class="prog-wrap">
+        <div class="prog-labels"><span id="s2hl">0.0h worked</span><span id="s2tl">/ 4.0h</span></div>
+        <div class="prog-track"><div class="prog-fill pf-orange" id="s2bar" style="width:0%"></div></div>
+      </div>
+      <div class="timerow" style="margin-bottom:10px">
+        <div class="tbox tlogin"><div class="tlbl">Login</div><div class="tval" id="s2lt">--:--</div><div class="taddr" id="s2la">—</div></div>
+        <div class="tbox tlogout"><div class="tlbl">Logout</div><div class="tval" id="s2ot">--:--</div><div class="taddr" id="s2oa">—</div></div>
+      </div>
+      <div class="btnrow">
+        <button class="abtn btn-orange" id="btnS2L" onclick="doShiftLogin('shift2')"><i class="fas fa-play"></i> Start S2</button>
+        <button class="abtn btn-red"    id="btnS2O" onclick="doShiftLogout('shift2')" disabled><i class="fas fa-stop"></i> End S2</button>
+      </div>
+      <button class="leavebtn" onclick="openLeave()"><i class="fas fa-calendar-times"></i> Apply for Leave</button>
+    </div>
+  </div>
+
+  <!-- ══ STATS TAB ══ -->
+  <div id="tab-stats" class="tab">
+    <div class="drange">
+      <div class="drange-row">
+        <div class="df"><label>From</label><input type="date" id="stFrom"></div>
+        <div class="df"><label>To</label><input type="date" id="stTo"></div>
+        <button class="drbtn" onclick="loadStats()"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+    <div id="statsOut" style="display:none">
+      <div class="stgrid">
+        <div class="sgcell"><div class="sgv" id="svDays">0</div><div class="sgl">Days</div></div>
+        <div class="sgcell"><div class="sgv" id="svHours">0</div><div class="sgl">Total hrs</div></div>
+        <div class="sgcell"><div class="sgv" id="svAvg">0</div><div class="sgl">Avg/Day</div></div>
+        <div class="sgcell"><div class="sgv" id="svLeaves">0</div><div class="sgl">Leaves</div></div>
+        <div class="sgcell"><div class="sgv" id="svEarly">0</div><div class="sgl">Early Outs</div></div>
+        <div class="sgcell"><div class="sgv" id="svSess">0</div><div class="sgl">Sessions</div></div>
+      </div>
+      <div class="scard">
+        <div class="stitle"><i class="fas fa-chart-pie"></i> Shift Breakdown</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:70px;text-align:center"><div class="sgv" id="svS1" style="color:var(--blue)">0</div><div class="sgl">S1 hrs</div></div>
+          <div style="flex:1;min-width:70px;text-align:center"><div class="sgv" id="svS2" style="color:var(--orange)">0</div><div class="sgl">S2 hrs</div></div>
+          <div style="flex:1;min-width:70px;text-align:center"><div class="sgv" id="svNorm" style="color:var(--green)">0</div><div class="sgl">Normal hrs</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="slbl">History</div>
+    <div id="stHistory" class="histlist"><div class="empty"><i class="fas fa-chart-bar"></i><p>Select range above</p></div></div>
+  </div>
+
+  <!-- ══ CALENDAR TAB ══ -->
+  <div id="tab-calendar" class="tab">
+    <div class="calcard">
+      <div class="calhead">
+        <div class="calmon" id="calMon">—</div>
+        <div class="calnav">
+          <button onclick="moveCal(-1)">◀</button>
+          <button onclick="moveCal(1)">▶</button>
+        </div>
+      </div>
+      <div class="calgrid" id="calGrid"></div>
+      <div class="calleg">
+        <div><span style="background:rgba(48,199,94,.25)"></span>Present</div>
+        <div><span style="background:var(--orange)"></span>Holiday</div>
+        <div><span style="background:rgba(255,149,0,.18)"></span>Leave</div>
+        <div><span style="background:rgba(0,113,227,.18)"></span>Today</div>
+      </div>
+    </div>
+    <div class="slbl">Holidays This Week</div><div id="weekHols"></div>
+    <div class="slbl">Holidays This Month</div><div id="monHols"></div>
+    <div class="slbl">My Leaves</div><div id="myLeaves"></div>
+  </div>
+</div><!-- /body -->
+
+<!-- BOTTOM NAV -->
+<nav class="botnav">
+  <button class="bnav on" id="bn-normal"   onclick="goTab('normal')"><i class="fas fa-clock"></i><span>Normal</span></button>
+  <button class="bnav"    id="bn-shift"    onclick="goTab('shift')"><i class="fas fa-layer-group"></i><span>Shift</span></button>
+  <button class="bnav"    id="bn-stats"    onclick="goTab('stats')"><i class="fas fa-chart-bar"></i><span>Stats</span></button>
+  <button class="bnav"    id="bn-calendar" onclick="goTab('calendar')"><i class="fas fa-calendar-alt"></i><span>Calendar</span></button>
+</nav>
+
+<!-- ══ FACE SHEET ══ -->
+<div class="backdrop" id="faceBD">
+  <div class="sheet">
+    <div class="shandle"></div>
+    <div class="shtitle" id="faceTit">🔒 Verify Identity</div>
+    <div class="shsub"   id="faceSub">Position face in oval and tap Scan</div>
+
+    <div class="camwrap">
+      <video id="fv" autoplay playsinline muted></video>
+      <canvas id="fc"></canvas>
+      <div class="camovl"><div class="camoval"></div></div>
+      <div class="camtxt" id="camTxt">Align your face inside the frame</div>
+    </div>
+
+    <!-- 5-photo progress (registration only) -->
+    <div id="photoProgressWrap" style="display:none">
+      <div class="photo-progress">
+        <div class="pp-dot active" id="pp1">1</div>
+        <div class="pp-dot"        id="pp2">2</div>
+        <div class="pp-dot"        id="pp3">3</div>
+        <div class="pp-dot"        id="pp4">4</div>
+        <div class="pp-dot"        id="pp5">5</div>
+      </div>
+      <div class="pp-label" id="ppLabel">Capture photo 1 of 5 — look straight at the camera</div>
+    </div>
+
+    <div class="fresult" id="fresult">
+      <div class="fricon" id="fricon">✅</div>
+      <div class="frmsg"  id="frmsg"></div>
+      <div class="frsub"  id="frsub"></div>
+    </div>
+
+    <div class="face-ready-banner" id="faceReadyBanner">
+      <div class="frb-icon">✅</div>
+      <div class="frb-text">
+        <div class="frb-title">Identity Verified! Proceeding…</div>
+        <div class="frb-sub">Your snapshot was captured for security logs.</div>
+      </div>
+    </div>
+
+    <div class="secnote" style="margin:10px 16px 0">
+      <i class="fas fa-shield-alt"></i>
+      <span>Snapshots are captured for admin audit only and stored securely.</span>
+    </div>
+
+    <div class="shbtns">
+      <button class="shbtn shbtn-blue" id="scanBtn" onclick="captureAndProcess()" disabled>
+        <i class="fas fa-camera"></i> <span id="scanTxt">Starting camera…</span>
+      </button>
+      <button class="shbtn shbtn-ghost" id="cancelFaceBtn" onclick="closeFace()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEAVE SHEET ══ -->
+<div class="backdrop" id="leaveBD">
+  <div class="sheet">
+    <div class="shandle"></div>
+    <div class="shtitle">📅 Apply for Leave</div>
+    <div class="lsheet">
+      <div class="frow"><label>Date *</label><input type="date" id="lvDate"></div>
+      <div class="frow"><label>Type *</label>
+        <select id="lvType">
+          <option value="">Select type…</option>
+          <option value="Sick Leave">Sick Leave</option>
+          <option value="Casual Leave">Casual Leave</option>
+          <option value="Personal Leave">Personal Leave</option>
+          <option value="Emergency">Emergency</option>
+        </select>
+      </div>
+      <div class="frow"><label>Reason</label><textarea id="lvReason" rows="3" placeholder="Brief reason…"></textarea></div>
+      <button class="shbtn shbtn-blue" onclick="submitLeave()" style="width:100%">Submit Application</button>
+      <button class="shbtn shbtn-ghost" onclick="closeLeaveBD()" style="width:100%;margin-top:8px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM SHEET ══ -->
+<div class="backdrop" id="confBD">
+  <div class="sheet">
+    <div class="shandle"></div>
+    <div class="shtitle">⚠️ Confirm</div>
+    <div class="csheet">
+      <div class="cmsg" id="confMsg"></div>
+      <button class="shbtn" id="confYes" style="background:var(--red);color:#fff;width:100%">Yes, Proceed</button>
+      <button class="shbtn shbtn-ghost" onclick="closeConf()" style="width:100%;margin-top:8px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let DD = null;
+let faceReg          = false;
+let faceRequired     = false;   // set by admin
+let faceRegEnabled   = false;   // set by admin
+let faceMode         = 'verify';
+let faceStream       = null;
+let faceCb           = null;
+
+// 5-photo registration
+let regPhotos     = [];
+let regPhotoCount = 5;
+let regPhotoIndex = 0;
+
+// Location
+let locState = {
+  checked:  false,
+  atOffice: false,
+  lat:      null,
+  lng:      null,
+  address:  '',
+  distance: null,
+};
+
+let attMap = {}, holMap = {}, lvMap = {};
+let calDt  = new Date();
+
+// ═══════════════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════════════
+(function tick(){
+  document.getElementById('liveTime').textContent =
+    new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  setTimeout(tick, 1000);
+})();
+
+const h0 = new Date().getHours();
+document.getElementById('wgreet').textContent = h0<12?'Good morning,':h0<17?'Good afternoon,':'Good evening,';
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, type='ok'){
+  const icons={ok:'check-circle',err:'exclamation-circle',warn:'exclamation-triangle',info:'info-circle'};
+  const el = document.getElementById('toast');
+  el.querySelector('i').className = `fas fa-${icons[type]||'info-circle'}`;
+  document.getElementById('toastTxt').textContent = msg;
+  el.className = `toast show t${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), 4500);
+}
+
+// ═══════════════════════════════════════════════
+//  TABS + DRAWER
+// ═══════════════════════════════════════════════
+function goTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.bnav').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ditem').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.getElementById('bn-'+t).classList.add('on');
+  const di = document.getElementById('di-'+t);
+  if(di) di.classList.add('active');
+  if(t==='calendar') renderCal();
+}
+function toggleDrawer(){ document.getElementById('drawer').classList.contains('open')?closeDrawer():openDrawer(); }
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('hbtn').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('hbtn').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+//  FACE STATUS UI  (admin-driven)
+// ═══════════════════════════════════════════════
+/**
+ * Updates all face-related UI across both tabs.
+ * @param {boolean} reg      - face photos registered
+ * @param {boolean} regEn    - admin allowed registration
+ * @param {boolean} required - admin requires face on login
+ * @param {number}  count    - photo count
+ */
+function updateFaceBadge(reg, regEn, required, count){
+  faceReg        = reg;
+  faceRegEnabled = regEn;
+  faceRequired   = required;
+
+  // ── Determine display state ──
+  let cardClass, icon, title, sub, chipClass, chipText, pillClass, pillHtml, badgeClass, badgeHtml;
+
+  if(required && reg){
+    // Admin requires + user has registered → active & ready
+    cardClass = 'face-status-card required-ok';
+    icon='🔒'; title='Face ID Active'; sub=`${count||0} photos registered · Verification enabled`;
+    chipClass='fsc-chip active'; chipText='Active';
+    pillClass='wpill face-ok';
+    pillHtml=`<i class="fas fa-lock"></i> <span>Face ID On${count?' ('+count+')':''}</span>`;
+    document.getElementById('dfacepill').className='dface-pill ok';
+    document.getElementById('dfacepill').innerHTML=`<i class="fas fa-check-circle"></i> Face ID active (${count||'?'} photos)`;
+
+  } else if(required && !reg){
+    // Admin requires but NOT registered yet
+    cardClass = 'face-status-card required-missing';
+    icon='⚠️'; title='Face ID Required'; sub=regEn?'Tap to register your face now':'Contact admin — face registration not yet enabled';
+    chipClass='fsc-chip missing'; chipText='Setup Needed';
+    pillClass='wpill face-warn';
+    pillHtml=`<i class="fas fa-exclamation-triangle"></i> <span>Face ID Required</span>`;
+    document.getElementById('dfacepill').className='dface-pill warn';
+    document.getElementById('dfacepill').innerHTML=`<i class="fas fa-exclamation-triangle"></i> Face ID required — ${regEn?'tap to register':'contact admin'}`;
+
+  } else if(!required && regEn && !reg){
+    // Admin allowed registration (optional — not required)
+    cardClass = 'face-status-card reg-allowed';
+    icon='📸'; title='Face Registration Available'; sub='Admin enabled — tap to register (optional)';
+    chipClass='fsc-chip ready'; chipText='Optional';
+    pillClass='wpill face-warn';
+    pillHtml=`<i class="fas fa-camera"></i> <span>Register Face</span>`;
+    document.getElementById('dfacepill').className='dface-pill warn';
+    document.getElementById('dfacepill').innerHTML=`<i class="fas fa-camera"></i> Tap to register your face`;
+
+  } else if(!required && reg){
+    // Registered but not required
+    cardClass = 'face-status-card no-face';
+    icon='✅'; title='Face Registered'; sub='Not required for login · Stored securely';
+    chipClass='fsc-chip off'; chipText='Not Required';
+    pillClass='wpill face-ok';
+    pillHtml=`<i class="fas fa-check-circle"></i> <span>Face Stored</span>`;
+    document.getElementById('dfacepill').className='dface-pill ok';
+    document.getElementById('dfacepill').innerHTML=`<i class="fas fa-check-circle"></i> Face registered (not required)`;
+
+  } else {
+    // No face requirement, no registration
+    cardClass = 'face-status-card no-face';
+    icon='🔓'; title='Face ID not required'; sub='Login directly — no face scan needed';
+    chipClass='fsc-chip off'; chipText='Off';
+    pillClass='wpill face-neutral';
+    pillHtml=`<i class="fas fa-camera-slash"></i> <span>No Face ID</span>`;
+    document.getElementById('dfacepill').className='dface-pill info';
+    document.getElementById('dfacepill').innerHTML=`<i class="fas fa-info-circle"></i> Face ID not required`;
+  }
+
+  // Apply to Normal tab card
+  const card = document.getElementById('faceStatusCard');
+  card.className = cardClass;
+  document.getElementById('fscIcon').textContent  = icon;
+  document.getElementById('fscTitle').textContent = title;
+  document.getElementById('fscSub').textContent   = sub;
+  const chip = document.getElementById('fscChip');
+  chip.className = chipClass; chip.textContent = chipText;
+
+  // Apply to Shift tab card
+  const cardS = document.getElementById('faceStatusCardS');
+  cardS.className = cardClass;
+  document.getElementById('fscIconS').textContent  = icon;
+  document.getElementById('fscTitleS').textContent = title;
+  document.getElementById('fscSubS').textContent   = sub;
+  const chipS = document.getElementById('fscChipS');
+  chipS.className = chipClass; chipS.textContent = chipText;
+
+  // Welcome badge
+  const badge = document.getElementById('wfacebadge');
+  badge.className = pillClass;
+  badge.innerHTML = pillHtml;
+  badge.onclick = (required && !reg && regEn) || (!required && regEn && !reg) ? ()=>openFace('register') : null;
+  badge.style.cursor = badge.onclick ? 'pointer' : 'default';
+
+  // Show/hide "Register Face" drawer item
+  document.getElementById('di-face-reg').style.display = regEn ? '' : 'none';
+}
+
+/** Tap on the face status card in normal tab */
+function handleFaceCardTap(){
+  if(faceRequired && !faceReg && faceRegEnabled){
+    openFace('register');
+  } else if(!faceRequired && faceRegEnabled && !faceReg){
+    openFace('register');
+  }
+}
+
+/** Drawer menu register button — checks admin permission first */
+function openFaceRegIfAllowed(){
+  if(faceRegEnabled){
+    openFace('register');
+  } else {
+    toast('Face registration has not been enabled by your administrator.','warn');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  LOCATION
+// ═══════════════════════════════════════════════
+function updateLocBanners(state, addr, dist){
+  const configs = [
+    { banner:'locBanner', icon:'locIcon', title:'locTitle', sub:'locSub', chip:'locChip' },
+    { banner:'locBannerS', icon:'locIconS', title:'locTitleS', sub:'locSubS', chip:'locChipS' },
+  ];
+  for(const ids of configs){
+    const b = document.getElementById(ids.banner); if(!b) continue;
+    b.className = `loc-banner ${state==='at'?'at-office':state==='out'?'not-office':'checking'}`;
+    const ic = document.getElementById(ids.icon);
+    if(ic) ic.textContent = state==='at'?'🏛️':state==='out'?'📡':'📡';
+    const tt = document.getElementById(ids.title);
+    const distStr = dist!=null?(dist<1?(dist*1000).toFixed(0)+'m':dist.toFixed(2)+'km'):'';
+    if(tt) tt.textContent = state==='at'?'JAIN University Campus':state==='out'?`${distStr} from campus`:'Detecting location…';
+    const ss = document.getElementById(ids.sub);
+    if(ss) ss.textContent = addr?addr.substring(0,55):'Tap to refresh GPS';
+    const cc = document.getElementById(ids.chip);
+    if(cc){ cc.textContent = state==='at'?'On Campus':state==='out'?'Off Campus':'Checking'; cc.className=`loc-chip ${state==='at'?'at':state==='out'?'out':'loading'}`; }
+  }
+}
+
+async function refreshLocation(){
+  updateLocBanners('checking','',null);
+  try{
+    const geo = await getGeo();
+    locState.lat = geo.lat; locState.lng = geo.lng;
+    const r = await fetch('/api/location/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:geo.lat,lng:geo.lng})});
+    const d = await r.json();
+    locState.atOffice = d.at_office;
+    locState.address  = d.address;
+    locState.distance = d.distance_km;
+    locState.checked  = true;
+    updateLocBanners(d.at_office?'at':'out', d.address, d.distance_km);
+  }catch(e){
+    updateLocBanners('checking','Could not get GPS — check permissions',null);
+    console.error('Location error:',e);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SMART LOGIN GATE  (admin-driven)
+// ═══════════════════════════════════════════════
+/**
+ * Calls cb(snapshotId, deviceInfo) if allowed.
+ * If admin has set face_required=true, opens verify sheet first.
+ * If admin has NOT set face_required, proceeds directly (location still captured).
+ */
+function needFace(cb){
+  if(!faceRequired){
+    // Admin does NOT require face — proceed directly
+    cb(null, devInfo());
+    return;
+  }
+  // Admin requires face
+  if(!faceReg){
+    if(faceRegEnabled){
+      toast('Face ID is required. Please register your face first.','warn');
+      setTimeout(()=>openFace('register'), 600);
+    } else {
+      toast('Face ID is required for your account but registration is not yet set up. Please contact your administrator.','warn');
+    }
+    return;
+  }
+  // Required + registered → open verify sheet
+  openFace('verify', cb);
+}
+
+// ═══════════════════════════════════════════════
+//  FACE MODAL
+// ═══════════════════════════════════════════════
+function openFace(mode, cb){
+  faceMode = mode; faceCb = cb||null;
+  regPhotos=[]; regPhotoIndex=0;
+
+  document.getElementById('faceTit').textContent = mode==='register'?'📸 Register Your Face (5 Photos)':'🔒 Face Verification';
+  document.getElementById('faceSub').textContent = mode==='register'?'Capture 5 clear photos for reliable recognition':'Align face in frame and tap Scan';
+  document.getElementById('fresult').style.display = 'none';
+  document.getElementById('faceReadyBanner').classList.remove('show');
+
+  const ppw = document.getElementById('photoProgressWrap');
+  if(mode==='register'){
+    ppw.style.display='block';
+    updatePhotoDots(0);
+    document.getElementById('scanBtn').innerHTML='<i class="fas fa-camera"></i> Starting camera…';
+  } else {
+    ppw.style.display='none';
+    document.getElementById('scanBtn').innerHTML='<i class="fas fa-camera"></i> <span id="scanTxt">Starting camera…</span>';
+  }
+  document.getElementById('scanBtn').disabled=true;
+  document.getElementById('cancelFaceBtn').style.display='';
+  document.getElementById('faceBD').classList.add('show');
+  startCam();
+}
+
+function closeFace(){
+  stopCam();
+  document.getElementById('faceBD').classList.remove('show');
+  document.getElementById('faceReadyBanner').classList.remove('show');
+  faceCb=null; regPhotos=[]; regPhotoIndex=0;
+}
+
+function startCam(){
+  stopCam();
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}})
+    .then(s=>{
+      faceStream=s;
+      const v=document.getElementById('fv');
+      v.srcObject=s;
+      v.onloadedmetadata=()=>{
+        v.play();
+        document.getElementById('scanBtn').disabled=false;
+        if(faceMode==='register'){
+          document.getElementById('scanBtn').innerHTML='<i class="fas fa-camera"></i> Capture Photo 1';
+          document.getElementById('camTxt').textContent='Camera ready · Look straight at camera';
+        } else {
+          document.getElementById('scanBtn').innerHTML='<i class="fas fa-camera"></i> Scan My Face';
+          document.getElementById('camTxt').textContent='✅ Camera ready — align face in oval';
         }
+      };
+    })
+    .catch(e=>{toast('Camera error: '+e.message,'err');closeFace();});
+}
+function stopCam(){
+  if(faceStream){faceStream.getTracks().forEach(t=>t.stop());faceStream=null;}
+}
+function grabFrame(){
+  const v=document.getElementById('fv'),c=document.getElementById('fc');
+  const w=v.videoWidth||v.clientWidth||640, h=v.videoHeight||v.clientHeight||480;
+  c.width=w; c.height=h;
+  c.getContext('2d').drawImage(v,0,0,w,h);
+  return c.toDataURL('image/jpeg',0.90);
+}
 
-        // Time update
-        function updateTime() {
-            const now = new Date();
-            const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-IN', options);
+function updatePhotoDots(captured){
+  for(let i=1;i<=5;i++){
+    const dot=document.getElementById('pp'+i);
+    if(i<=captured) dot.className='pp-dot captured';
+    else if(i===captured+1) dot.className='pp-dot active';
+    else dot.className='pp-dot';
+  }
+  const msgs=[
+    'Photo 1 of 5 — look straight at camera',
+    'Photo 2 of 5 — slight left tilt',
+    'Photo 3 of 5 — slight right tilt',
+    'Photo 4 of 5 — chin slightly down',
+    'Photo 5 of 5 — normal position again',
+    '✅ All 5 photos captured — registering…'
+  ];
+  document.getElementById('ppLabel').textContent=msgs[Math.min(captured,5)];
+}
+
+async function captureAndProcess(){
+  const btn=document.getElementById('scanBtn');
+  btn.disabled=true;
+  document.getElementById('fresult').style.display='none';
+  document.getElementById('faceReadyBanner').classList.remove('show');
+  const img=grabFrame();
+
+  if(faceMode==='register'){
+    regPhotos.push(img);
+    regPhotoIndex++;
+    updatePhotoDots(regPhotoIndex);
+    document.getElementById('camTxt').textContent=`✅ Photo ${regPhotoIndex} captured`;
+
+    if(regPhotoIndex < regPhotoCount){
+      const hints=['','Tilt slightly LEFT','Tilt slightly RIGHT','Chin slightly DOWN','Normal position'];
+      document.getElementById('scanBtn').innerHTML=`<i class="fas fa-camera"></i> Capture Photo ${regPhotoIndex+1}`;
+      document.getElementById('camTxt').textContent=`📸 Photo ${regPhotoIndex}/${regPhotoCount} done · Next: ${hints[regPhotoIndex]||'look at camera'}`;
+      btn.disabled=false;
+      return;
+    }
+
+    // All 5 — send to server
+    btn.innerHTML='<i class="fas fa-spinner spin"></i> Registering…';
+    document.getElementById('camTxt').textContent='🔄 Processing all 5 photos…';
+    let rawText='';
+    try{
+      const r=await fetch('/api/face/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:regPhotos})});
+      rawText=await r.text();
+      let d;
+      try{d=JSON.parse(rawText);}catch(pe){throw new Error('Server returned non-JSON: '+rawText.substring(0,200));}
+      if(d.ok){
+        showFR(true,'Face Registered! ✅',d.message||`${d.photo_count} photos stored.`);
+        // Refresh face status
+        await loadFaceStatus();
+        stopCam();
+        document.getElementById('photoProgressWrap').style.display='none';
+        setTimeout(closeFace, 2500);
+      } else {
+        if(d.admin_required){
+          showFR(false,'Not Permitted ❌','Face registration has not been enabled by admin.');
+          setTimeout(closeFace,2500);
+        } else if(d.bad_pairs){
+          showFR(false,'Photos Don\'t Match ❌',d.error);
+          regPhotos=[]; regPhotoIndex=0;
+          updatePhotoDots(0);
+          document.getElementById('scanBtn').innerHTML='<i class="fas fa-camera"></i> Retry — Capture Photo 1';
+          btn.disabled=false;
+        } else if(d.photo_index!==undefined){
+          showFR(false,`Photo ${d.photo_index+1} Failed ❌`,d.error);
+          regPhotos.pop(); regPhotoIndex--;
+          updatePhotoDots(regPhotoIndex);
+          document.getElementById('scanBtn').innerHTML=`<i class="fas fa-camera"></i> Retry Photo ${regPhotoIndex+1}`;
+          btn.disabled=false;
+        } else {
+          showFR(false,'Registration Failed ❌',d.error||'Unknown error');
+          btn.disabled=false;
+          btn.innerHTML='<i class="fas fa-camera"></i> Retry';
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+      }
+    }catch(e){
+      showFR(false,'Error: '+e.message,'Check connection and try again.');
+      btn.disabled=false;
+      btn.innerHTML='<i class="fas fa-camera"></i> Retry';
+    }
 
-        // Alert system
-        function showAlert(msg, type = 'success') {
-            const container = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-            container.appendChild(alert);
-            setTimeout(() => alert.remove(), 5000);
-        }
+  } else {
+    // ── Verify ──
+    btn.innerHTML='<i class="fas fa-spinner spin"></i> Verifying…';
+    document.getElementById('camTxt').textContent='Checking identity…';
+    try{
+      const r=await fetch('/api/face/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:img,device_info:devInfo(),at_office:locState.atOffice})});
+      const d=await r.json();
+      if(d.ok){
+        document.getElementById('faceReadyBanner').classList.add('show');
+        document.getElementById('camTxt').textContent='✅ Identity confirmed!';
+        stopCam();
+        const cb=faceCb; faceCb=null;
+        setTimeout(()=>{closeFace(); if(cb) cb(d.snapshot_id, devInfo());}, 1800);
+      } else {
+        const dist=d.distance?` (score: ${d.distance.toFixed(3)})`:'';
+        showFR(false,'Face Mismatch ❌',(d.error||'Face did not match.')+dist+'\nEnsure good lighting and face the camera directly.');
+        document.getElementById('camTxt').textContent='❌ Mismatch — try again';
+        btn.innerHTML='<i class="fas fa-camera"></i> Try Again';
+        btn.disabled=false;
+      }
+    }catch(e){
+      showFR(false,'Network Error',e.message);
+      btn.innerHTML='<i class="fas fa-camera"></i> Try Again';
+      btn.disabled=false;
+    }
+  }
+}
 
-        // Logout
-        function logout() {
-            window.location.href = '/logout';
-        }
+function showFR(ok, msg, sub){
+  const el=document.getElementById('fresult');
+  el.style.display='block';
+  el.className='fresult '+(ok?'ok':'err');
+  document.getElementById('fricon').textContent=ok?'✅':'❌';
+  document.getElementById('frmsg').textContent=msg;
+  document.getElementById('frsub').textContent=sub||'';
+}
 
-        // Location
-        function getLocation(cb) {
-            if (!navigator.geolocation) {
-                return cb("Geolocation not supported");
-            }
-            
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    cb(null, pos.coords.latitude, pos.coords.longitude);
-                },
-                err => cb("Location access required for attendance"),
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
+// ═══════════════════════════════════════════════
+//  FACE STATUS POLL  (lightweight)
+// ═══════════════════════════════════════════════
+async function loadFaceStatus(){
+  try{
+    const r=await fetch('/api/face/status');
+    const d=await r.json();
+    updateFaceBadge(
+      d.face_registered        || false,
+      d.face_registration_enabled || false,
+      d.face_required          || false,
+      d.photo_count            || 0
+    );
+  }catch(e){ console.error('Face status error:',e); }
+}
 
-        // Haversine formula
-        function haversine(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
+// ═══════════════════════════════════════════════
+//  ATTENDANCE ACTIONS
+// ═══════════════════════════════════════════════
+function doNLogin(){
+  needFace(async(snapId, di)=>{
+    const btn=document.getElementById('btnNLogin');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner spin"></i>';
+    try{
+      const geo=await getGeo();
+      const r=await fetch('/attendance/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:geo.lat,lng:geo.lng,login_type:'normal',snapshot_id:snapId,device_info:di||devInfo(),at_office:locState.atOffice})});
+      const d=await r.json();
+      if(d.ok){
+        toast(`✅ Logged in! ${d.at_office?'🏢 Office':'📡 Remote'}`,'ok');
+        document.getElementById('nLoginTime').textContent=d.login_time;
+        document.getElementById('nLoginAddr').textContent=d.address||'—';
+        loadDD();
+      } else toast(d.error||'Login failed','err');
+    }catch(e){toast(e.message||'Error','err');}
+    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Login';}
+  });
+}
 
-        // Check location
-        function checkLocation(lat, lng) {
-            if (!dashboardData) {
-                showAlert('Data not loaded', 'danger');
-                return false;
-            }
-            
-            const dist = haversine(lat, lng, dashboardData.office_lat, dashboardData.office_lng);
-            if (dist > dashboardData.allowed_radius_km) {
-                showAlert(`You are ${dist.toFixed(2)}km from office. Max allowed: ${dashboardData.allowed_radius_km}km`, 'danger');
-                return false;
-            }
-            return true;
-        }
+function doNLogout(){
+  const btn=document.getElementById('btnNLogout');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner spin"></i>';
+  getGeo().catch(()=>({lat:null,lng:null})).then(geo=>doLogout(geo.lat,geo.lng,'normal'))
+    .finally(()=>{btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-out-alt"></i> Logout';});
+}
 
-        // NORMAL LOGIN
-        function handleNormalLogin() {
-            getLocation((err, lat, lng) => {
-                if (err) {
-                    showAlert(err, 'danger');
-                    return;
-                }
-                
-                if (!checkLocation(lat, lng)) return;
-                
-                const btn = document.getElementById('normalLoginBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Logging in...';
-                
-                fetch('/attendance/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ lat, lng, login_type: 'normal' })
-                })
-                .then(r => r.json())
-                .then(d => {
-                    if (d.ok) {
-                        showAlert('✅ Login successful!', 'success');
-                        document.getElementById('normalLoginTime').textContent = d.login_time;
-                        document.getElementById('normalLoginAddress').textContent = d.address;
-                        loadDashboardData();
-                    } else {
-                        showAlert(d.error || 'Login failed', 'danger');
-                    }
-                })
-                .catch(() => showAlert('Network error', 'danger'))
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-                });
-            });
-        }
+function doShiftLogin(type){
+  needFace(async(snapId,di)=>{
+    const name=type==='shift1'?'Shift 1':'Shift 2';
+    const btn=document.getElementById(type==='shift1'?'btnS1L':'btnS2L');
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner spin"></i>';
+    try{
+      const geo=await getGeo();
+      const r=await fetch('/attendance/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:geo.lat,lng:geo.lng,login_type:'shift',shift_type:type,shift_name:name,snapshot_id:snapId,device_info:di||devInfo(),at_office:locState.atOffice})});
+      const d=await r.json();
+      if(d.ok){
+        toast(`✅ ${name} started! ${d.at_office?'🏢':'📡'}`,'ok');
+        document.getElementById(type==='shift1'?'s1lt':'s2lt').textContent=d.login_time;
+        document.getElementById(type==='shift1'?'s1la':'s2la').textContent=d.address||'—';
+        loadDD();
+      } else toast(d.error||'Failed','err');
+    }catch(e){toast(e.message,'err');}
+    finally{btn.disabled=false;btn.innerHTML=`<i class="fas fa-play"></i> Start ${type==='shift1'?'S1':'S2'}`;}
+  });
+}
 
-        function handleNormalLogout() {
-            getLocation((err, lat, lng) => {
-                if (err) {
-                    showAlert(err, 'danger');
-                    return;
-                }
-                
-                const btn = document.getElementById('normalLogoutBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Logging out...';
-                
-                performLogout(lat, lng, 'normal');
-            });
-        }
+function doShiftLogout(type){
+  const btn=document.getElementById(type==='shift1'?'btnS1O':'btnS2O');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner spin"></i>';
+  getGeo().catch(()=>({lat:null,lng:null})).then(geo=>doLogout(geo.lat,geo.lng,type))
+    .finally(()=>{btn.disabled=false;btn.innerHTML=`<i class="fas fa-stop"></i> End ${type==='shift1'?'S1':'S2'}`});
+}
 
-        // SHIFT LOGIN
-        function startShift(shiftType) {
-            getLocation((err, lat, lng) => {
-                if (err) {
-                    showAlert(err, 'danger');
-                    return;
-                }
-                
-                if (!checkLocation(lat, lng)) return;
-                
-                const shiftName = shiftType === 'shift1' ? 'Shift 1' : 'Shift 2';
-                const btn = document.getElementById(shiftType + 'LoginBtn');
-                
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Starting...';
-                
-                fetch('/attendance/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        lat, lng,
-                        login_type: 'shift',
-                        shift_type: shiftType,
-                        shift_name: shiftName
-                    })
-                })
-                .then(r => r.json())
-                .then(d => {
-                    if (d.ok) {
-                        showAlert(`✅ ${shiftName} started!`, 'success');
-                        document.getElementById(shiftType + 'LoginTime').textContent = d.login_time;
-                        document.getElementById(shiftType + 'LoginAddress').textContent = d.address;
-                        loadDashboardData();
-                    } else {
-                        showAlert(d.error || 'Failed to start shift', 'danger');
-                    }
-                })
-                .catch(() => showAlert('Network error', 'danger'))
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fas fa-play"></i> Start ${shiftName}`;
-                });
-            });
-        }
+async function doLogout(lat,lng,type,force=false){
+  const r=await fetch('/attendance/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lng,shift_type:type,force_logout:force})});
+  const d=await r.json();
+  if(d.warning){
+    openConf(d.message,()=>doLogout(lat,lng,type,true));
+  } else if(d.ok){
+    toast(`✅ Logged out · ${d.hours}h worked`,d.target_achieved?'ok':'warn');
+    if(type==='normal'){document.getElementById('nLogoutTime').textContent=d.logout_time;document.getElementById('nLogoutAddr').textContent=d.address||'—';}
+    else if(type==='shift1'){document.getElementById('s1ot').textContent=d.logout_time;document.getElementById('s1oa').textContent=d.address||'—';}
+    else{document.getElementById('s2ot').textContent=d.logout_time;document.getElementById('s2oa').textContent=d.address||'—';}
+    loadDD();
+  } else toast(d.error||'Logout failed','err');
+}
 
-        function endShift(shiftType) {
-            getLocation((err, lat, lng) => {
-                if (err) {
-                    showAlert(err, 'danger');
-                    return;
-                }
-                
-                const btn = document.getElementById(shiftType + 'LogoutBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Ending...';
-                
-                performLogout(lat, lng, shiftType);
-            });
-        }
+// ═══════════════════════════════════════════════
+//  DASHBOARD DATA
+// ═══════════════════════════════════════════════
+async function loadDD(){
+  try{
+    const r=await fetch('/api/dashboard-data');
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    DD=d;
 
-        // Generic logout function
-        function performLogout(lat, lng, shiftType, force = false) {
-            fetch('/attendance/logout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lat, lng, shift_type: shiftType, force_logout: force })
-            })
-            .then(r => r.json())
-            .then(d => {
-                if (d.warning) {
-                    showConfirm(d.message, () => performLogout(lat, lng, shiftType, true));
-                    const btn = document.getElementById(shiftType === 'normal' ? 'normalLogoutBtn' : shiftType + 'LogoutBtn');
-                    btn.disabled = false;
-                    btn.innerHTML = shiftType === 'normal' ? '<i class="fas fa-sign-out-alt"></i> Logout' : `<i class="fas fa-stop"></i> End ${shiftType === 'shift1' ? 'Shift 1' : 'Shift 2'}`;
-                } else if (d.ok) {
-                    showAlert(`✅ Logged out! Worked ${d.hours} hours`, d.target_achieved ? 'success' : 'info');
-                    
-                    if (shiftType === 'normal') {
-                        document.getElementById('normalLogoutTime').textContent = d.logout_time;
-                        document.getElementById('normalLogoutAddress').textContent = d.address || 'Address recorded';
-                    } else {
-                        document.getElementById(shiftType + 'LogoutTime').textContent = d.logout_time;
-                        document.getElementById(shiftType + 'LogoutAddress').textContent = d.address || 'Address recorded';
-                    }
-                    
-                    loadDashboardData();
-                } else {
-                    showAlert(d.error || 'Logout failed', 'danger');
-                }
-            })
-            .catch(() => showAlert('Network error', 'danger'));
-        }
+    // Face status (admin-driven)
+    updateFaceBadge(
+      d.face_registered          || false,
+      d.face_registration_enabled || false,
+      d.face_required            || false,
+      d.face_photo_count         || 0
+    );
 
-        // Load dashboard data
-        async function loadDashboardData() {
-            try {
-                const res = await fetch('/api/dashboard-data');
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                dashboardData = data;
-                updateUI(data);
-                await loadLeaves();
-                await loadAllHolidays();
-            } catch (err) {
-                showAlert('Failed to load data: ' + err.message, 'danger');
-            }
-        }
+    document.getElementById('wname').textContent  =d.username;
+    document.getElementById('dname').textContent  =d.username;
+    document.getElementById('davatar').textContent=d.username[0].toUpperCase();
 
-        // Update UI
-        function updateUI(data) {
-            document.getElementById('username').textContent = data.username;
-            
-            // Update welcome message
-            const now = new Date();
-            const hour = now.getHours();
-            let greeting = 'Good ';
-            if (hour < 12) greeting += 'Morning';
-            else if (hour < 17) greeting += 'Afternoon';
-            else greeting += 'Evening';
-            document.getElementById('welcomeMessage').textContent = greeting + '! Ready to mark your attendance?';
-            
-            // Normal tab
-            document.getElementById('normalTodayHours').textContent = data.total_hours_today.toFixed(1);
-            document.getElementById('normalTarget').textContent = data.work_hours_target;
-            
-            if (data.active_session && data.active_session.login_type === 'normal') {
-                document.getElementById('normalCurrentHours').textContent = data.active_session.hours;
-                document.getElementById('normalSessionInfo').textContent = 'Active since ' + data.active_session.login_time;
-                document.getElementById('normalLogoutBtn').disabled = false;
-                
-                // Show active login time
-                document.getElementById('normalLoginTime').textContent = data.active_session.login_time;
-                document.getElementById('normalLoginAddress').textContent = data.active_session.login_address;
-            } else {
-                document.getElementById('normalCurrentHours').textContent = '0.0';
-                document.getElementById('normalSessionInfo').textContent = 'No active session';
-                document.getElementById('normalLogoutBtn').disabled = true;
-            }
-            
-            // Shift tab
-            document.getElementById('shift1Hours').textContent = data.shift1_hours.toFixed(1);
-            document.getElementById('shift2Hours').textContent = data.shift2_hours.toFixed(1);
-            document.getElementById('shift1Target').textContent = data.shift_target.toFixed(1);
-            document.getElementById('shift2Target').textContent = data.shift_target.toFixed(1);
-            document.getElementById('shiftTotalToday').textContent = data.total_hours_today.toFixed(1);
-            document.getElementById('shiftTotalTarget').textContent = data.work_hours_target;
-            
-            // Update shift cards
-            document.getElementById('shift1Card').classList.toggle('completed', data.shift1_completed);
-            document.getElementById('shift2Card').classList.toggle('completed', data.shift2_completed);
-            
-            // Update shift buttons and times
-            if (data.active_session) {
-                if (data.active_session.shift_type === 'shift1') {
-                    document.getElementById('shift1LogoutBtn').disabled = false;
-                    document.getElementById('shift1LoginBtn').disabled = true;
-                    document.getElementById('shift2LoginBtn').disabled = data.shift2_completed;
-                    
-                    document.getElementById('shift1LoginTime').textContent = data.active_session.login_time;
-                    document.getElementById('shift1LoginAddress').textContent = data.active_session.login_address;
-                } else if (data.active_session.shift_type === 'shift2') {
-                    document.getElementById('shift2LogoutBtn').disabled = false;
-                    document.getElementById('shift2LoginBtn').disabled = true;
-                    document.getElementById('shift1LoginBtn').disabled = data.shift1_completed;
-                    
-                    document.getElementById('shift2LoginTime').textContent = data.active_session.login_time;
-                    document.getElementById('shift2LoginAddress').textContent = data.active_session.login_address;
-                } else {
-                    document.getElementById('shift1LoginBtn').disabled = data.shift1_completed;
-                    document.getElementById('shift2LoginBtn').disabled = data.shift2_completed;
-                }
-            } else {
-                document.getElementById('shift1LoginBtn').disabled = data.shift1_completed;
-                document.getElementById('shift2LoginBtn').disabled = data.shift2_completed;
-                document.getElementById('shift1LogoutBtn').disabled = true;
-                document.getElementById('shift2LogoutBtn').disabled = true;
-            }
-            
-            // Update history
-            updateHistory(data.history);
-            
-            // Update calendar data
-            attendanceData = {};
-            data.history.forEach(r => {
-                if (!attendanceData[r.date]) {
-                    attendanceData[r.date] = [];
-                }
-                attendanceData[r.date].push(r);
-            });
-            
-            renderAllCalendars();
-        }
+    // Normal tab
+    document.getElementById('nHoursToday').textContent=d.total_hours_today.toFixed(1);
+    document.getElementById('nTarget').textContent=`/ ${d.work_hours_target}h`;
+    const pct=Math.min(100,(d.total_hours_today/d.work_hours_target)*100);
+    document.getElementById('nProgBar').style.width=pct+'%';
 
-        // Update history table
-        function updateHistory(history) {
-            const normalHistory = history.filter(h => h.login_type === 'normal').slice(0, 10);
-            
-            if (normalHistory.length === 0) {
-                document.getElementById('normalHistory').innerHTML = '<div style="text-align: center; padding: 40px; color: #86868b;">No normal login history</div>';
-                return;
-            }
-            
-            let html = '<table><thead><tr><th>Date</th><th>Login</th><th>Logout</th><th>Hours</th></tr></thead><tbody>';
-            normalHistory.forEach(h => {
-                html += `
-                    <tr>
-                        <td>${h.date}</td>
-                        <td>${h.login_time}</td>
-                        <td>${h.logout_time || 'Active'}</td>
-                        <td><span class="badge" style="background: #e8f4fd; color: #0071e3; padding: 4px 12px; border-radius: 20px;">${h.hours} hrs</span></td>
-                    </tr>
-                `;
-            });
-            html += '</tbody></table>';
-            document.getElementById('normalHistory').innerHTML = html;
-        }
+    if(d.active_session && d.active_session.login_type==='normal'){
+      document.getElementById('nHoursSess').textContent =d.active_session.hours;
+      document.getElementById('nSessStatus').textContent='Active since '+d.active_session.login_time;
+      document.getElementById('nLoginTime').textContent =d.active_session.login_time;
+      document.getElementById('nLoginAddr').textContent =d.active_session.login_address||'—';
+      document.getElementById('btnNLogin').disabled =true;
+      document.getElementById('btnNLogout').disabled=false;
+    } else {
+      document.getElementById('nHoursSess').textContent ='0.0';
+      document.getElementById('nSessStatus').textContent='No active session';
+      document.getElementById('btnNLogin').disabled =false;
+      document.getElementById('btnNLogout').disabled=true;
+    }
 
-        // Load statistics
-        async function loadStatistics() {
-            const start = document.getElementById('statsStartDate').value;
-            const end = document.getElementById('statsEndDate').value;
-            
-            if (!start || !end) {
-                showAlert('Please select both start and end dates', 'danger');
-                return;
-            }
-            
-            try {
-                const res = await fetch('/api/statistics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ start_date: start, end_date: end })
-                });
-                
-                const data = await res.json();
-                
-                if (data.ok) {
-                    document.getElementById('statisticsResults').style.display = 'block';
-                    
-                    document.getElementById('statTotalDays').textContent = data.total_days;
-                    document.getElementById('statTotalHours').textContent = data.total_hours.toFixed(1);
-                    document.getElementById('statAvgHours').textContent = data.avg_hours_per_day.toFixed(1);
-                    document.getElementById('statShift1').textContent = data.shift1_hours.toFixed(1);
-                    document.getElementById('statShift2').textContent = data.shift2_hours.toFixed(1);
-                    document.getElementById('statNormal').textContent = data.normal_hours.toFixed(1);
-                    document.getElementById('statEarlyLogouts').textContent = data.early_logouts;
-                    document.getElementById('statLeaves').textContent = data.leaves_taken;
-                    document.getElementById('statSessions').textContent = data.shift1_sessions + data.shift2_sessions + data.normal_sessions;
-                    
-                    // Load detailed table
-                    await loadStatisticsTable(start, end);
-                    
-                } else {
-                    showAlert(data.error || 'Failed to load statistics', 'danger');
-                }
-            } catch (err) {
-                showAlert('Error loading statistics', 'danger');
-            }
-        }
+    // Shift tab
+    document.getElementById('sTotalDisp').textContent =d.total_hours_today.toFixed(1);
+    document.getElementById('sTargetDisp').textContent=d.work_hours_target;
+    const st=d.shift_target||4;
+    document.getElementById('s1hl').textContent=d.shift1_hours.toFixed(1)+'h worked';
+    document.getElementById('s1tl').textContent='/ '+st.toFixed(1)+'h';
+    document.getElementById('s2hl').textContent=d.shift2_hours.toFixed(1)+'h worked';
+    document.getElementById('s2tl').textContent='/ '+st.toFixed(1)+'h';
+    document.getElementById('s1bar').style.width=Math.min(100,(d.shift1_hours/st)*100)+'%';
+    document.getElementById('s2bar').style.width=Math.min(100,(d.shift2_hours/st)*100)+'%';
 
-        // Load statistics table
-        async function loadStatisticsTable(start, end) {
-            try {
-                const res = await fetch('/api/dashboard-data');
-                const data = await res.json();
-                
-                const filteredHistory = data.history.filter(h => h.date >= start && h.date <= end);
-                
-                let html = '';
-                filteredHistory.forEach(h => {
-                    html += `
-                        <tr>
-                            <td>${h.date}</td>
-                            <td>${h.login_type}</td>
-                            <td><span class="badge" style="background: ${h.shift_type === 'shift1' ? '#e8f4fd' : h.shift_type === 'shift2' ? '#fff3cd' : '#f5f5f7'}; color: ${h.shift_type === 'shift1' ? '#0071e3' : h.shift_type === 'shift2' ? '#ff9500' : '#86868b'}; padding: 4px 12px; border-radius: 20px;">${h.shift_name}</span></td>
-                            <td>${h.login_time}</td>
-                            <td>${h.logout_time || 'Active'}</td>
-                            <td>${h.hours} hrs</td>
-                        </tr>
-                    `;
-                });
-                
-                if (html === '') {
-                    html = '<tr><td colspan="6" style="text-align: center;">No records found</td></tr>';
-                }
-                
-                document.getElementById('statisticsTableBody').innerHTML = html;
-                
-            } catch (err) {
-                console.error('Error loading table:', err);
-            }
-        }
+    const pill=(id,done,active)=>{
+      const el=document.getElementById(id);
+      if(done){el.className='spill sp-ok';el.textContent='✓ Done';}
+      else if(active){el.className='spill sp-active';el.textContent='● Active';}
+      else{el.className='spill sp-pending';el.textContent='● Pending';}
+    };
+    const s1a=d.active_session?.shift_type==='shift1', s2a=d.active_session?.shift_type==='shift2';
+    pill('s1pill',d.shift1_completed,s1a);
+    pill('s2pill',d.shift2_completed,s2a);
+    document.getElementById('btnS1L').disabled=d.shift1_completed||s1a;
+    document.getElementById('btnS1O').disabled=!s1a;
+    document.getElementById('btnS2L').disabled=d.shift2_completed||s2a;
+    document.getElementById('btnS2O').disabled=!s2a;
+    if(s1a){document.getElementById('s1lt').textContent=d.active_session.login_time;document.getElementById('s1la').textContent=d.active_session.login_address||'—';}
+    if(s2a){document.getElementById('s2lt').textContent=d.active_session.login_time;document.getElementById('s2la').textContent=d.active_session.login_address||'—';}
 
-        // Calendar functions
-        function renderCalendar(monthKey, elementId) {
-            const date = currentMonth[monthKey] || currentMonth.normal;
-            const y = date.getFullYear(), m = date.getMonth();
-            
-            document.getElementById(elementId + 'Month').textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-            
-            const first = new Date(y, m, 1);
-            const last = new Date(y, m + 1, 0);
-            const startWeek = first.getDay();
-            const total = last.getDate();
-            
-            const grid = document.getElementById(elementId + 'Grid');
-            grid.innerHTML = '';
-            
-            // Day headers
-            ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
-                const h = document.createElement('div');
-                h.className = 'calendar-day-header';
-                h.textContent = d;
-                grid.appendChild(h);
-            });
-            
-            // Previous month
-            for (let i = startWeek - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.style.opacity = '0.5';
-                day.textContent = new Date(y, m, 0).getDate() - i;
-                grid.appendChild(day);
-            }
-            
-            // Current month
-            const today = new Date();
-            for (let d = 1; d <= total; d++) {
-                const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                
-                const dayNumber = document.createElement('div');
-                dayNumber.className = 'day-number';
-                dayNumber.textContent = d;
-                day.appendChild(dayNumber);
-                
-                if (d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) {
-                    day.classList.add('today');
-                }
-                
-                if (holidayData[dateStr]) {
-                    day.classList.add('holiday');
-                } else if (leaveData[dateStr] && leaveData[dateStr].status === 'approved') {
-                    day.classList.add('leave');
-                } else if (attendanceData[dateStr] && attendanceData[dateStr].length > 0) {
-                    day.classList.add('present');
-                    
-                    if (attendanceData[dateStr].length > 1) {
-                        const indicator = document.createElement('div');
-                        indicator.className = 'session-indicator';
-                        for (let i = 0; i < Math.min(attendanceData[dateStr].length, 3); i++) {
-                            const dot = document.createElement('span');
-                            dot.className = 'dot';
-                            indicator.appendChild(dot);
-                        }
-                        day.appendChild(indicator);
-                    }
-                }
-                
-                day.onclick = () => showDayDetails(dateStr);
-                grid.appendChild(day);
-            }
-        }
+    // History
+    attMap={};
+    d.history.forEach(h=>{if(!attMap[h.date])attMap[h.date]=[];attMap[h.date].push(h);});
+    renderHist(d.history.filter(h=>h.login_type==='normal').slice(0,10),'nHistory');
 
-        function renderAllCalendars() {
-            renderCalendar('normal', 'normalCalendar');
-            renderCalendar('shift', 'shiftCalendar');
-            renderCalendar('full', 'fullCalendar');
-        }
+    await loadLeaves();
+    await loadHols();
+  }catch(e){toast('Load error: '+e.message,'err');}
+}
 
-        function changeMonth(delta, calendarType) {
-            if (!currentMonth[calendarType]) {
-                currentMonth[calendarType] = new Date();
-            }
-            currentMonth[calendarType].setMonth(currentMonth[calendarType].getMonth() + delta);
-            
-            if (calendarType === 'normal') {
-                renderCalendar('normal', 'normalCalendar');
-            } else if (calendarType === 'shift') {
-                renderCalendar('shift', 'shiftCalendar');
-            } else {
-                renderCalendar('full', 'fullCalendar');
-            }
-            
-            loadMonthHolidaysForCalendar(calendarType);
-        }
+function renderHist(list,id){
+  const el=document.getElementById(id);
+  if(!list.length){el.innerHTML='<div class="empty"><i class="fas fa-history"></i><p>No history yet</p></div>';return;}
+  el.innerHTML=list.map(h=>`<div class="hitem">
+    <div class="hdot" style="background:${h.logout_time&&h.logout_time!='N/A'?'var(--green)':'var(--orange)'}"></div>
+    <div class="hbody">
+      <div class="hdate">${h.date}
+        <span class="hbadge ${h.at_office?'hb-office':'hb-remote'}">${h.at_office?'🏢 Office':'📡 Remote'}</span>
+      </div>
+      <div class="htimes">${h.login_time} → ${h.logout_time||'Active'}</div>
+    </div>
+    <div class="hhrs">${h.hours}h</div>
+  </div>`).join('');
+}
 
-        // Load all holidays
-        async function loadAllHolidays() {
-            try {
-                // Load weekly holidays for all tabs
-                const today = new Date();
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - today.getDay());
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 6);
-                
-                const res = await fetch('/api/holidays');
-                const data = await res.json();
-                
-                const weeklyHolidays = [];
-                Object.entries(data.holidays).forEach(([date, info]) => {
-                    const holidayDate = new Date(date);
-                    if (holidayDate >= weekStart && holidayDate <= weekEnd) {
-                        weeklyHolidays.push({ date, ...info });
-                    }
-                });
-                
-                // Update weekly holidays for all tabs
-                const tabs = ['normal', 'shift', 'full'];
-                tabs.forEach(tab => {
-                    document.getElementById(tab + 'WeeklyHolidayCount').textContent = weeklyHolidays.length + ' Holiday' + (weeklyHolidays.length !== 1 ? 's' : '');
-                    
-                    const container = document.getElementById(tab + 'WeeklyHolidays');
-                    
-                    if (weeklyHolidays.length === 0) {
-                        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #86868b;">No holidays this week</div>';
-                    } else {
-                        container.innerHTML = weeklyHolidays.map(h => `
-                            <div class="holiday-item">
-                                <div class="holiday-date">
-                                    <span class="holiday-day">${h.day}</span>
-                                    <span class="holiday-type">${h.type}</span>
-                                </div>
-                                <div class="holiday-name">${h.name}</div>
-                                <div class="holiday-date-badge">${h.date}</div>
-                            </div>
-                        `).join('');
-                    }
-                });
-                
-                // Load monthly holidays
-                await loadMonthlyHolidays();
-                
-            } catch (err) {
-                console.error('Error loading holidays:', err);
-            }
-        }
+// ─ Stats ─
+async function loadStats(){
+  const from=document.getElementById('stFrom').value, to=document.getElementById('stTo').value;
+  if(!from||!to){toast('Select date range','warn');return;}
+  try{
+    const r=await fetch('/api/statistics',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({start_date:from,end_date:to})});
+    const d=await r.json();
+    if(!d.ok){toast(d.error||'Error','err');return;}
+    document.getElementById('statsOut').style.display='block';
+    document.getElementById('svDays').textContent  =d.total_days;
+    document.getElementById('svHours').textContent =d.total_hours.toFixed(1);
+    document.getElementById('svAvg').textContent   =d.avg_hours_per_day.toFixed(1);
+    document.getElementById('svLeaves').textContent=d.leaves_taken;
+    document.getElementById('svEarly').textContent =d.early_logouts;
+    document.getElementById('svSess').textContent  =(d.shift1_sessions||0)+(d.shift2_sessions||0)+(d.normal_sessions||0);
+    document.getElementById('svS1').textContent    =d.shift1_hours.toFixed(1);
+    document.getElementById('svS2').textContent    =d.shift2_hours.toFixed(1);
+    document.getElementById('svNorm').textContent  =d.normal_hours.toFixed(1);
+    if(DD){const f=DD.history.filter(h=>h.date>=from&&h.date<=to);renderHist(f,'stHistory');}
+  }catch{toast('Stats error','err');}
+}
 
-        async function loadMonthlyHolidays() {
-            try {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = today.getMonth() + 1;
-                
-                const res = await fetch(`/api/holidays?year=${year}&month=${month}`);
-                const data = await res.json();
-                
-                const monthlyHolidays = Object.values(data.holidays);
-                const tabs = ['normal', 'shift', 'full'];
-                
-                tabs.forEach(tab => {
-                    document.getElementById(tab + 'MonthlyHolidayCount').textContent = monthlyHolidays.length + ' Holiday' + (monthlyHolidays.length !== 1 ? 's' : '');
-                    
-                    const container = document.getElementById(tab + 'MonthlyHolidays');
-                    
-                    if (monthlyHolidays.length === 0) {
-                        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #86868b;">No holidays this month</div>';
-                    } else {
-                        container.innerHTML = monthlyHolidays.map(h => `
-                            <div class="holiday-item">
-                                <div class="holiday-date">
-                                    <span class="holiday-day">${h.day}</span>
-                                    <span class="holiday-type">${h.type}</span>
-                                </div>
-                                <div class="holiday-name">${h.name}</div>
-                                <div class="holiday-date-badge">${h.date}</div>
-                            </div>
-                        `).join('');
-                    }
-                });
-                
-                // Update holiday data for calendar
-                holidayData = data.holidays || {};
-                renderAllCalendars();
-                
-            } catch (err) {
-                console.error('Error loading monthly holidays:', err);
-            }
-        }
+// ─ Calendar ─
+function renderCal(){
+  const y=calDt.getFullYear(),m=calDt.getMonth();
+  document.getElementById('calMon').textContent=calDt.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const g=document.getElementById('calGrid'); g.innerHTML='';
+  ['S','M','T','W','T','F','S'].forEach(d=>{const x=document.createElement('div');x.className='cdh';x.textContent=d;g.appendChild(x);});
+  const first=new Date(y,m,1),last=new Date(y,m+1,0),today=new Date();
+  for(let i=0;i<first.getDay();i++){const x=document.createElement('div');x.className='cday other';x.textContent=new Date(y,m,0).getDate()-first.getDay()+1+i;g.appendChild(x);}
+  for(let d=1;d<=last.getDate();d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el=document.createElement('div');el.className='cday';el.textContent=d;
+    if(d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear())el.classList.add('today');
+    if(holMap[ds])el.classList.add('holiday');
+    else if(lvMap[ds]?.status==='approved')el.classList.add('leave');
+    else if(attMap[ds]?.length){el.classList.add('present');if(attMap[ds].length>1){const dot=document.createElement('div');dot.className='cdot';el.appendChild(dot);}}
+    el.onclick=()=>calTap(ds);
+    g.appendChild(el);
+  }
+}
+function moveCal(d){calDt.setMonth(calDt.getMonth()+d);renderCal();loadMonHols();}
+function calTap(ds){
+  if(holMap[ds])return toast('🎉 '+holMap[ds].name,'info');
+  if(lvMap[ds]?.status==='approved')return toast('📅 '+lvMap[ds].type+' – Approved','info');
+  const s=attMap[ds]||[];
+  if(s.length)toast(`✅ ${s.length} session · ${s[0].login_time}→${s[0].logout_time||'Active'} · ${s[0].hours}h`,'ok');
+  else openConf(`No attendance on ${ds}. Apply for leave?`,()=>openLeave(ds));
+}
 
-        async function loadMonthHolidaysForCalendar(calendarType) {
-            try {
-                const date = currentMonth[calendarType] || new Date();
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-                
-                const res = await fetch(`/api/holidays?year=${year}&month=${month}`);
-                const data = await res.json();
-                
-                holidayData = { ...holidayData, ...data.holidays };
-                
-                if (calendarType === 'normal') {
-                    renderCalendar('normal', 'normalCalendar');
-                } else if (calendarType === 'shift') {
-                    renderCalendar('shift', 'shiftCalendar');
-                } else {
-                    renderCalendar('full', 'fullCalendar');
-                }
-                
-            } catch (err) {
-                console.error('Error loading month holidays:', err);
-            }
-        }
+async function loadHols(){
+  try{
+    const r=await fetch('/api/holidays');const d=await r.json();
+    const today=new Date(), ws=new Date(today); ws.setDate(today.getDate()-today.getDay());
+    const we=new Date(ws); we.setDate(ws.getDate()+6);
+    const wh=[],mh=[];
+    Object.entries(d.holidays).forEach(([dt,info])=>{
+      const hd=new Date(dt);
+      if(hd>=ws&&hd<=we)wh.push({date:dt,...info});
+      if(hd.getMonth()===today.getMonth()&&hd.getFullYear()===today.getFullYear())mh.push({date:dt,...info});
+    });
+    holMap=d.holidays||{};
+    const rh=(list,id)=>{const el=document.getElementById(id);el.innerHTML=list.length?list.map(h=>`<div class="holitem"><div class="holname">${h.name}</div><div class="holmeta"><span>${h.date}</span><span class="holbadge">${h.type}</span></div></div>`).join(''):'<div class="empty" style="padding:16px"><p>None</p></div>';};
+    rh(wh,'weekHols'); rh(mh,'monHols');
+    renderCal();
+  }catch{}
+}
+async function loadMonHols(){
+  try{const r=await fetch(`/api/holidays?year=${calDt.getFullYear()}&month=${calDt.getMonth()+1}`);const d=await r.json();holMap={...holMap,...(d.holidays||{})};renderCal();}catch{}
+}
+async function loadLeaves(){
+  try{
+    const r=await fetch('/api/leaves');lvMap=await r.json();
+    const app=Object.entries(lvMap).filter(([,v])=>v.status==='approved').map(([date,v])=>({date,...v})).sort((a,b)=>a.date.localeCompare(b.date));
+    const el=document.getElementById('myLeaves');
+    el.innerHTML=app.length?app.map(l=>`<div class="holitem" style="border-left-color:var(--green)"><div class="holname">${l.type}</div><div class="holmeta"><span>${l.date}</span><span class="holbadge" style="background:var(--green)">Approved</span></div></div>`).join(''):'<div class="empty" style="padding:16px"><i class="fas fa-calendar-check"></i><p>No leaves yet</p></div>';
+    renderCal();
+  }catch{}
+}
 
-        // Show day details
-        function showDayDetails(dateStr) {
-            const holiday = holidayData[dateStr];
-            const leave = leaveData[dateStr];
-            const sessions = attendanceData[dateStr] || [];
-            
-            let message = `Date: ${dateStr}\n\n`;
-            
-            if (holiday) {
-                message += `🎉 HOLIDAY\n${holiday.name}\nType: ${holiday.type}`;
-                alert(message);
-                return;
-            }
-            
-            if (leave && leave.status === 'approved') {
-                message += `📅 LEAVE\nType: ${leave.type}\nStatus: Approved`;
-                alert(message);
-                return;
-            }
-            
-            if (sessions.length > 0) {
-                message += `✅ ${sessions.length} Session(s)\n\n`;
-                sessions.forEach((s, i) => {
-                    message += `Session ${i+1} (${s.shift_name}):\n`;
-                    message += `  Login: ${s.login_time}\n`;
-                    message += `  Logout: ${s.logout_time || 'Active'}\n`;
-                    message += `  Hours: ${s.hours}\n`;
-                    message += `  Location: ${s.login_address}\n\n`;
-                });
-                alert(message);
-            } else {
-                const apply = confirm(`${dateStr}\n\nNo attendance. Apply for leave?`);
-                if (apply) openLeaveModal(dateStr);
-            }
-        }
+// ─ Leave modal ─
+function openLeave(ds=null){
+  const inp=document.getElementById('lvDate');
+  if(ds)inp.value=ds;
+  else{const t=new Date();t.setDate(t.getDate()+1);inp.value=t.toISOString().split('T')[0];}
+  inp.min=new Date().toISOString().split('T')[0];
+  document.getElementById('leaveBD').classList.add('show');
+}
+function closeLeaveBD(){document.getElementById('leaveBD').classList.remove('show');}
+async function submitLeave(){
+  const date=document.getElementById('lvDate').value;
+  const type=document.getElementById('lvType').value;
+  const comments=document.getElementById('lvReason').value;
+  if(!date||!type){toast('Fill required fields','warn');return;}
+  try{
+    const r=await fetch('/api/leave/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date,type,comments})});
+    const d=await r.json();
+    if(d.ok){toast('✅ Leave submitted','ok');closeLeaveBD();await loadLeaves();}
+    else toast(d.error||'Failed','err');
+  }catch{toast('Submit error','err');}
+}
 
-        // Load leaves
-        async function loadLeaves() {
-            try {
-                const res = await fetch('/api/leaves');
-                const data = await res.json();
-                leaveData = data || {};
-                
-                // Update user leaves list
-                const userLeaves = Object.entries(leaveData)
-                    .filter(([_, info]) => info.status === 'approved')
-                    .map(([date, info]) => ({ date, ...info }))
-                    .sort((a, b) => a.date.localeCompare(b.date));
-                
-                const container = document.getElementById('userLeavesList');
-                
-                if (userLeaves.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #86868b;">No leaves taken</div>';
-                } else {
-                    container.innerHTML = userLeaves.map(leave => `
-                        <div class="holiday-item">
-                            <div class="holiday-date">
-                                <span class="holiday-day">${new Date(leave.date).toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                                <span class="holiday-type" style="background: #34c759;">Approved</span>
-                            </div>
-                            <div class="holiday-name">${leave.type}</div>
-                            <div class="holiday-date-badge">${leave.date}</div>
-                        </div>
-                    `).join('');
-                }
-                
-            } catch (err) {
-                console.error('Error loading leaves:', err);
-            }
-        }
+// ─ Confirm modal ─
+function openConf(msg,cb){
+  document.getElementById('confMsg').textContent=msg;
+  document.getElementById('confYes').onclick=()=>{closeConf();cb();};
+  document.getElementById('confBD').classList.add('show');
+}
+function closeConf(){document.getElementById('confBD').classList.remove('show');}
 
-        // Leave modal
-        function openLeaveModal(dateStr = null) {
-            document.getElementById('leaveModal').classList.add('active');
-            const dateInput = document.getElementById('leaveDate');
-            
-            if (dateStr) {
-                dateInput.value = dateStr;
-            } else {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                dateInput.value = tomorrow.toISOString().split('T')[0];
-            }
-            
-            const today = new Date();
-            dateInput.min = today.toISOString().split('T')[0];
-        }
+// ─ Backdrop tap ─
+['faceBD','leaveBD','confBD'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target.id===id){
+      if(id==='faceBD')closeFace();
+      else if(id==='leaveBD')closeLeaveBD();
+      else closeConf();
+    }
+  });
+});
 
-        function closeLeaveModal() {
-            document.getElementById('leaveModal').classList.remove('active');
-            document.getElementById('leaveForm').reset();
-        }
+// ─ Logout ─
+function handleLogout(){ window.location.href='/logout'; }
 
-        // Submit leave
-        async function submitLeave(event) {
-            event.preventDefault();
-            
-            const date = document.getElementById('leaveDate').value;
-            const type = document.getElementById('leaveType').value;
-            const comments = document.getElementById('leaveComments').value;
-            
-            if (!date || !type) {
-                showAlert('Please fill all required fields', 'danger');
-                return;
-            }
-            
-            const btn = document.querySelector('#leaveForm button');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Submitting...';
-            
-            try {
-                const res = await fetch('/api/leave/apply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ date, type, comments })
-                });
-                
-                const data = await res.json();
-                
-                if (data.ok) {
-                    showAlert('✅ Leave application submitted', 'success');
-                    closeLeaveModal();
-                    await loadLeaves();
-                    renderAllCalendars();
-                } else {
-                    showAlert('❌ ' + (data.error || 'Failed to submit'), 'danger');
-                }
-            } catch (err) {
-                showAlert('Failed to submit leave', 'danger');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Submit Application';
-            }
-        }
+// ─ Helpers ─
+function getGeo(){
+  return new Promise((res,rej)=>{
+    if(!navigator.geolocation)return rej(new Error('Geolocation not supported'));
+    navigator.geolocation.getCurrentPosition(
+      p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),
+      ()=>rej(new Error('Location permission required')),
+      {enableHighAccuracy:true,timeout:10000}
+    );
+  });
+}
+function devInfo(){
+  return{userAgent:navigator.userAgent,platform:navigator.platform,screen:`${screen.width}x${screen.height}`,deviceMemory:navigator.deviceMemory||'N/A',cores:navigator.hardwareConcurrency||'N/A',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,imei:'Not available (browser)'};
+}
 
-        // Confirmation modal
-        function showConfirm(message, onConfirm) {
-            document.getElementById('confirmMessage').textContent = message;
-            document.getElementById('confirmYesBtn').onclick = () => {
-                closeConfirmModal();
-                onConfirm();
-            };
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-        }
-
-        // Close modals on outside click
-        document.getElementById('leaveModal').addEventListener('click', e => {
-            if (e.target === e.currentTarget) closeLeaveModal();
-        });
-        
-        document.getElementById('confirmModal').addEventListener('click', e => {
-            if (e.target === e.currentTarget) closeConfirmModal();
-        });
-
-        // Initialize
-        loadDashboardData();
-        loadAllHolidays();
-    </script>
+// ─ Init ─
+loadDD();
+refreshLocation();
+</script>
 </body>
 </html>
