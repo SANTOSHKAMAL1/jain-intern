@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, send_file, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, send_file, jsonify, session
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -29,7 +29,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'info.loginpanel@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'wedbfepklgtwtugf')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'info.loginpanel@gmail.com')
 
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
@@ -404,6 +404,40 @@ def logout():
     flash("Logged out", "info")
     return redirect(url_for("login"))
 
+@app.route("/admin/impersonate/<user_id>")
+@login_required
+def impersonate_user(user_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+    user_doc = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    if not user_doc:
+        flash("User not found", "danger")
+        return redirect(url_for("admin_dashboard"))
+    
+    session["admin_impersonator_id"] = current_user.id
+    user_obj = User(user_doc)
+    login_user(user_obj)
+    flash(f"Impersonating {user_obj.username}", "info")
+    return redirect(url_for("user_dashboard"))
+
+@app.route("/admin/revert")
+@login_required
+def revert_impersonation():
+    admin_id = session.get("admin_impersonator_id")
+    if not admin_id:
+        flash("Not impersonating anyone", "danger")
+        return redirect(url_for("login"))
+    
+    admin_doc = mongo.db.users.find_one({"_id": ObjectId(admin_id)})
+    if admin_doc:
+        session.pop("admin_impersonator_id", None)
+        admin_obj = User(admin_doc)
+        login_user(admin_obj)
+        flash("Reverted to admin", "success")
+        return redirect(url_for("admin_dashboard"))
+    
+    return redirect(url_for("logout"))
+
 
 # ─────────────────────────────────────────────────────────────
 #  LOCATION CHECK
@@ -472,6 +506,9 @@ def admin_set_face_settings(user_id):
 
         if "face_registration_enabled" in data:
             updates["face_registration_enabled"] = bool(data["face_registration_enabled"])
+
+        if "shift_login_enabled" in data:
+            updates["shift_login_enabled"] = bool(data["shift_login_enabled"])
 
         if data.get("clear_face_data"):
             updates["face_registered"]           = False
@@ -817,6 +854,70 @@ def attendance_login():
     }
     mongo.db.attendance.insert_one(attendance_record)
 
+    if snapshot_id:
+        try:
+            mongo.db.face_security_logs.update_one(
+                {"_id": ObjectId(snapshot_id)},
+                {"$set": {"shift_type": shift_type, "shift_name": shift_name}}
+            )
+        except Exception as e:
+            print(f"Error updating face log shift: {e}")
+
+    # Send email notification
+    try:
+        user_email = user.get("email")
+        if user_email:
+            import random
+            quotes = [
+                "Success is the sum of small efforts, repeated day in and day out.",
+                "The only way to do great work is to love what you do.",
+                "Don't watch the clock; do what it does. Keep going.",
+                "Opportunities don't happen, you create them.",
+                "Believe you can and you're halfway there.",
+                "Your positive action combined with positive thinking results in success."
+            ]
+            quote = random.choice(quotes)
+            
+            msg = Message("Login Confirmation - JAIN Attendance", recipients=[user_email])
+            msg.html = f"""
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f5f5f7; padding: 40px 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <div style="background-color: #0071e3; padding: 30px 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">JAIN Attendance</h1>
+                    </div>
+                    <div style="padding: 40px 30px;">
+                        <h2 style="margin-top: 0; color: #1d1d1f; font-size: 20px;">Hello {current_user.username},</h2>
+                        <p style="color: #555; font-size: 16px; line-height: 1.6;">You have successfully logged in to the portal.</p>
+                        
+                        <div style="background-color: #f5f5f7; border-radius: 12px; padding: 20px; margin: 25px 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0; color: #86868b; font-weight: 600; width: 40%;">Shift Type</td>
+                                    <td style="padding: 8px 0; color: #1d1d1f; font-weight: 700; text-align: right;">{shift_name}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; color: #86868b; font-weight: 600; width: 40%;">Login Time</td>
+                                    <td style="padding: 8px 0; color: #1d1d1f; font-weight: 700; text-align: right;">{format_ist_time(now_utc)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; color: #86868b; font-weight: 600; width: 40%;">Location</td>
+                                    <td style="padding: 8px 0; color: #1d1d1f; font-weight: 700; text-align: right; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{address}">{address}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <p style="color: #86868b; font-style: italic; text-align: center; margin-top: 30px; font-size: 15px;">"{quote}"</p>
+                    </div>
+                    <div style="background-color: #f5f5f7; padding: 20px; text-align: center; font-size: 13px; color: #a1a1a6;">
+                        This is an automated message from the JAIN Intern Attendance System.
+                    </div>
+                </div>
+            </div>
+            """
+            mail.send(msg)
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
     return jsonify({
         "ok":               True,
         "login_time":       format_ist_time(now_utc),
@@ -926,10 +1027,12 @@ def get_face_logs():
         user_filter = request.args.get("username")
         match_filter = request.args.get("match")
         date_filter  = request.args.get("date")
+        shift_filter = request.args.get("shift")
         query = {}
         if user_filter:              query["username"]     = user_filter
         if match_filter is not None: query["match_result"] = (match_filter.lower() == "true")
         if date_filter:              query["date"]         = date_filter
+        if shift_filter:             query["shift_type"]   = shift_filter
         total = mongo.db.face_security_logs.count_documents(query)
         logs  = list(
             mongo.db.face_security_logs.find(query, {"face_image_b64": 0})
@@ -946,6 +1049,8 @@ def get_face_logs():
                 "match_distance":   log.get("match_distance"),
                 "at_office":        log.get("at_office"),
                 "face_thumb_b64":   log.get("face_thumb_b64"),
+                "shift_type":       log.get("shift_type", "normal"),
+                "shift_name":       log.get("shift_name", "Normal Login"),
                 "device_info":      log.get("device_info", {}),
                 "ip_address":       log.get("ip_address"),
                 "reviewed_by_admin": log.get("reviewed_by_admin", False)
@@ -1126,11 +1231,16 @@ def get_dashboard_data():
         user              = mongo.db.users.find_one({"_id": ObjectId(current_user.id)})
         work_hours_target = user.get("work_hours", DEFAULT_WORK_HOURS)
         shift_target      = work_hours_target / 2
+        shift_login_enabled = user.get("shift_login_enabled", True)
 
-        cutoff      = (date.today() - timedelta(days=365)).isoformat()
+        # Single query for history — limit to last 90 days for performance
+        cutoff      = (date.today() - timedelta(days=90)).isoformat()
         all_records = list(mongo.db.attendance.find(
-            {"user_id": ObjectId(current_user.id), "date": {"$gte": cutoff}}
-        ).sort("date", -1))
+            {"user_id": ObjectId(current_user.id), "date": {"$gte": cutoff}},
+            {"login_time": 1, "logout_time": 1, "hours": 1, "date": 1,
+             "shift_type": 1, "shift_name": 1, "login_type": 1,
+             "session_number": 1, "login_location": 1, "logout_location": 1, "at_office": 1}
+        ).sort("date", -1).limit(200))
 
         total_hours = sum([r.get("hours", 0) or 0 for r in all_records])
 
@@ -1158,7 +1268,10 @@ def get_dashboard_data():
                 "at_office":      rec.get("at_office", False),
             })
 
-        leaves     = list(mongo.db.leave_applications.find({"user_id": ObjectId(current_user.id), "status": "approved"}))
+        leaves      = list(mongo.db.leave_applications.find(
+            {"user_id": ObjectId(current_user.id), "status": "approved"},
+            {"date": 1}
+        ))
         leave_dates = [l["date"] for l in leaves]
 
         return jsonify({
@@ -1183,6 +1296,7 @@ def get_dashboard_data():
             "office_lng":             OFFICE_LNG,
             "allowed_radius_km":      ALLOWED_RADIUS_KM,
             "face_required_radius_km": FACE_REQUIRED_RADIUS_KM,
+            "shift_login_enabled":     shift_login_enabled,
             "history":                all_formatted,
             "leaves":                 leave_dates,
             "shifts":                 SHIFT_TIMINGS,

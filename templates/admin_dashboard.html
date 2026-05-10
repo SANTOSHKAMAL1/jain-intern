@@ -30,8 +30,8 @@
         .stat-card .value { font-size: 2.5rem; font-weight: 800; color: #0071e3; }
         .stat-card .label { font-size: 0.85rem; color: #86868b; text-transform: uppercase; margin-top: 8px; }
         .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .user-card { background: #f5f5f7; border-radius: 16px; padding: 20px; transition: all 0.3s; }
-        .user-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,113,227,0.15); }
+        .user-card { background: #ffffff; border-radius: 20px; padding: 24px; transition: all 0.3s; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .user-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,113,227,0.12); border-color: rgba(0,113,227,0.2); }
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .user-name { font-weight: 700; font-size: 1.1rem; }
         .role-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
@@ -374,6 +374,20 @@
                                 </label>
                             </div>
 
+                            <!-- Toggle: Enable Shift Login -->
+                            <div class="face-toggle-row">
+                                <div>
+                                    <div class="face-toggle-label">Enable Shift Login</div>
+                                    <div class="face-toggle-sub">Allow user to log in to specific shifts</div>
+                                </div>
+                                <label class="ios-toggle">
+                                    <input type="checkbox" class="face-req-toggle"
+                                        data-uid="{{ user._id }}"
+                                        {% if user.get('shift_login_enabled', True) %}checked{% endif %}
+                                        onchange="toggleFaceSetting('{{ user._id }}','shift_login_enabled',this.checked,'{{ user.username }}')">
+                                    <span class="track"></span>
+                                </label>
+                            </div>
                             <!-- Status summary chips -->
                             <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
                                 <span class="face-status-chip {% if user.get('face_required') %}fsc-required{% else %}fsc-not-required{% endif %}" id="chip-req-{{ user._id }}">
@@ -398,7 +412,10 @@
                                 <i class="fas fa-eye"></i> Details & Hours
                             </button>
                             {% if user.role != 'admin' %}
-                            <button class="btn btn-danger btn-sm" onclick="deleteUser('{{ user._id }}','{{ user.username }}')">
+                            <button class="btn btn-warning btn-sm" onclick="window.location.href='/admin/impersonate/{{ user._id }}'" title="Login As User">
+                                <i class="fas fa-user-secret"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('{{ user._id }}','{{ user.username }}')" title="Delete User">
                                 <i class="fas fa-trash"></i>
                             </button>
                             {% endif %}
@@ -474,6 +491,15 @@
                             <option value="">All</option>
                             <option value="true">✅ Matched</option>
                             <option value="false">❌ Failed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">Shift</label>
+                        <select id="filterShift">
+                            <option value="">All</option>
+                            <option value="normal">Normal Login</option>
+                            <option value="shift1">Shift 1</option>
+                            <option value="shift2">Shift 2</option>
                         </select>
                     </div>
                     <div><label style="font-size:0.8rem;">Date</label><input type="date" id="filterDate"></div>
@@ -618,29 +644,39 @@
             });
             const data = await res.json();
             if (data.ok) {
-                const label = setting === 'face_required' ? 'Face ID Requirement' : 'Face Registration';
+                // Pick the correct human-readable label
+                let label;
+                if (setting === 'face_required') label = 'Face ID Requirement';
+                else if (setting === 'face_registration_enabled') label = 'Face Registration';
+                else if (setting === 'shift_login_enabled') label = 'Shift Login';
+                else label = setting;
+
                 const state = value ? 'enabled' : 'disabled';
                 showAlert(`${label} ${state} for ${username}`, 'success');
 
-                // Update status chips
+                // Update status chips (only for face-related settings)
                 if (setting === 'face_required') {
                     const chip = document.getElementById(`chip-req-${userId}`);
                     if (chip) {
                         chip.className = `face-status-chip ${value ? 'fsc-required' : 'fsc-not-required'}`;
                         chip.innerHTML = `<i class="fas fa-${value ? 'lock' : 'lock-open'}"></i> ${value ? 'Face ID On' : 'Face ID Off'}`;
                     }
-                } else {
+                } else if (setting === 'face_registration_enabled') {
                     const chip = document.getElementById(`chip-reg-${userId}`);
                     if (chip) {
                         chip.className = `face-status-chip ${value ? 'fsc-registered' : 'fsc-not-registered'}`;
                         chip.innerHTML = `<i class="fas fa-${value ? 'check' : 'times'}"></i> ${value ? 'Reg Allowed' : 'Reg Blocked'}`;
                     }
                 }
+                // No chip update needed for shift_login_enabled
             } else {
                 showAlert(data.error || 'Update failed', 'danger');
-                // Revert toggle on failure
-                const toggle = document.querySelector(`input[data-uid="${userId}"].${setting === 'face_required' ? 'face-req-toggle' : 'face-reg-toggle'}`);
-                if (toggle) toggle.checked = !value;
+                // Revert toggle on failure — find the correct toggle by data-uid
+                const allToggles = document.querySelectorAll(`input[data-uid="${userId}"]`);
+                allToggles.forEach(t => {
+                    const onchangeAttr = t.getAttribute('onchange') || '';
+                    if (onchangeAttr.includes(`'${setting}'`)) t.checked = !value;
+                });
             }
         } catch (e) {
             showAlert('Network error: ' + e.message, 'danger');
@@ -669,11 +705,13 @@
         const user = document.getElementById('filterUser').value.trim();
         const match = document.getElementById('filterMatch').value;
         const date = document.getElementById('filterDate').value;
+        const shift = document.getElementById('filterShift').value;
 
         let url = `/api/admin/face-logs?page=${page}&per_page=12`;
         if (user) url += `&username=${encodeURIComponent(user)}`;
         if (match !== '') url += `&match=${match}`;
         if (date) url += `&date=${date}`;
+        if (shift) url += `&shift=${shift}`;
 
         document.getElementById('faceLogsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:#86868b;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i><br>Loading...</div>';
 
@@ -701,6 +739,7 @@
                     <div class="face-log-body">
                         <div class="face-log-username">${log.username}</div>
                         <div class="face-log-time">${log.timestamp_ist || 'N/A'}</div>
+                        <div class="face-log-time" style="color: #0071e3; font-weight: bold; margin-top: 2px;">${log.shift_name || 'Normal Login'}</div>
                         <div class="device-info-grid">
                             <span class="di-label">Device</span><span class="di-value">${di.device_name || 'Unknown'}</span>
                             <span class="di-label">Browser</span><span class="di-value">${di.browser || 'Unknown'}</span>
@@ -814,6 +853,7 @@
         document.getElementById('filterUser').value = '';
         document.getElementById('filterMatch').value = '';
         document.getElementById('filterDate').value = '';
+        document.getElementById('filterShift').value = '';
         loadFaceLogs(1);
     }
 

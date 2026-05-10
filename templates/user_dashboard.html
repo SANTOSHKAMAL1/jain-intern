@@ -56,16 +56,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .dsep{height:1px;background:var(--bdr);margin:6px 0}
 
 /* ─ BODY ─ */
-.body{padding-top:calc(var(--nav) + 12px);padding-bottom:calc(var(--bot) + 12px + var(--safe-bot));padding-left:14px;padding-right:14px;max-width:500px;margin:0 auto;}
+.body{padding-top:calc(var(--nav) + 12px);padding-bottom:calc(var(--bot) + 12px + var(--safe-bot));padding-left:14px;padding-right:14px;max-width:800px;margin:0 auto;}
 .tab{display:none}
 .tab.on{display:block}
 
 /* ─ WELCOME CARD ─ */
-.wcard{background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);border-radius:18px;padding:16px 18px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;}
-.wcard::after{content:'';position:absolute;right:-16px;top:-16px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07)}
-.wcard::before{content:'';position:absolute;right:30px;bottom:-22px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.05)}
-.wgreet{font-size:.68rem;opacity:.8;font-weight:500;margin-bottom:2px}
-.wname{font-size:1.25rem;font-weight:800;line-height:1.2;margin-bottom:10px}
+.wcard{background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);border-radius:24px;padding:24px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(0,113,227,0.35);}
+.wcard::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0))}
+.wcard::before{content:'';position:absolute;right:60px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0))}
+.wgreet{font-size:.85rem;opacity:.9;font-weight:600;margin-bottom:4px;letter-spacing:0.5px;}
+.wname{font-size:1.6rem;font-weight:800;line-height:1.2;margin-bottom:16px;}
 .wpills{display:flex;gap:7px;flex-wrap:wrap}
 .wpill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:20px;font-size:.68rem;font-weight:600;}
 .wpill.face-ok{background:rgba(48,199,94,.22);border-color:rgba(48,199,94,.38)}
@@ -108,7 +108,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .loc-chip.loading{background:var(--blue);color:#fff}
 
 /* ─ SECTION CARD ─ */
-.scard{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 10px rgba(0,0,0,.06);}
+.scard{background:var(--card);border-radius:24px;padding:20px;margin-bottom:16px;box-shadow:0 8px 30px rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,0.02);}
 .stitle{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
 .stitle i{color:var(--blue)}
 
@@ -135,10 +135,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .tbox.tlogout .tval{color:var(--red)}
 
 /* ─ BUTTONS ─ */
-.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.abtn{padding:13px 10px;border:none;border-radius:12px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s;font-family:'Plus Jakarta Sans',sans-serif;}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.abtn{padding:16px 12px;border:none;border-radius:16px;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);font-family:'Plus Jakarta Sans',sans-serif;}
 .abtn:active:not(:disabled){transform:scale(.96)}
-.abtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.abtn:hover:not(:disabled){transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15);}
+.abtn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
 .btn-green{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(48,199,94,.35)}
 .btn-red{background:var(--red);color:#fff;box-shadow:0 3px 12px rgba(255,59,48,.35)}
 .btn-blue{background:var(--blue);color:#fff;box-shadow:0 3px 12px rgba(0,113,227,.3)}
@@ -305,9 +306,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </head>
 <body>
 
+{% if session.get('admin_impersonator_id') %}
+<div style="background-color: #ff9500; color: white; padding: 12px; text-align: center; font-weight: bold; z-index: 10000; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <i class="fas fa-user-secret"></i> You are impersonating {{ current_user.username }} 
+    <a href="/admin/revert" style="margin-left: 15px; color: white; text-decoration: underline; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 6px;">Return to Admin Dashboard</a>
+</div>
+{% endif %}
+
+
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-logo">J</div>
+  <img src="{{ url_for('static', filename='images/logo.png') }}" alt="JAIN Logo" style="height: 32px; object-fit: contain; margin-left: 4px;">
   <div class="topbar-info">
     <div class="uni">JAIN UNIVERSITY</div>
     <div class="dept">Office of Academics</div>
@@ -1175,6 +1184,17 @@ async function loadDD(){
     if(d.error) throw new Error(d.error);
     DD=d;
 
+    if (d.active_session) {
+      const target = d.active_session.login_type === 'normal' ? d.work_hours_target : (d.shift_target || 4);
+      if (d.active_session.hours >= target && !window.shiftTargetNotified) {
+        toast("🎉 Working hours target completed! You may log out or continue working.", "ok");
+        window.shiftTargetNotified = true;
+      }
+    } else {
+      window.shiftTargetNotified = false;
+    }
+
+
     // Face status (admin-driven)
     updateFaceBadge(
       d.face_registered          || false,
@@ -1186,6 +1206,19 @@ async function loadDD(){
     document.getElementById('wname').textContent  =d.username;
     document.getElementById('dname').textContent  =d.username;
     document.getElementById('davatar').textContent=d.username[0].toUpperCase();
+
+    const shiftTabBtnDrawer = document.getElementById('di-shift');
+    const shiftTabBtnBotnav = document.getElementById('bn-shift');
+    if (d.shift_login_enabled === false) {
+        if(shiftTabBtnDrawer) shiftTabBtnDrawer.style.display = 'none';
+        if(shiftTabBtnBotnav) shiftTabBtnBotnav.style.display = 'none';
+        if (document.getElementById('tab-shift') && document.getElementById('tab-shift').classList.contains('on')) {
+            if(typeof goTab === 'function') goTab('normal');
+        }
+    } else {
+        if(shiftTabBtnDrawer) shiftTabBtnDrawer.style.display = '';
+        if(shiftTabBtnBotnav) shiftTabBtnBotnav.style.display = '';
+    }
 
     // Normal tab
     document.getElementById('nHoursToday').textContent=d.total_hours_today.toFixed(1);
@@ -1401,6 +1434,8 @@ function devInfo(){
 // ─ Init ─
 loadDD();
 refreshLocation();
+setInterval(loadDD, 60000); // Polling every minute to update active session hours and trigger notification
+
 </script>
 </body>
 </html>
